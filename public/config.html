@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración — N de Nails</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-links">
+    <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
+    <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
+    <a href="/whatsapp.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/reportes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <a href="/config.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+  </div>
+  <div class="nav-salones">
+    <div class="label">Salones</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Configuración</h1>
+  </div>
+  <div class="page">
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content">
+      <button class="btn active-tab" id="tab-tecnicas" onclick="showTab('tecnicas')">Técnicas</button>
+      <button class="btn btn-ghost" id="tab-servicios" onclick="showTab('servicios')">Servicios</button>
+    </div>
+
+    <!-- TÉCNICAS -->
+    <div id="panel-tecnicas">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-weight:600">Técnicas</span>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalTecnica()">+ Agregar técnica</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Nombre</th><th>Salón</th><th>Comisión</th><th>Estado</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="tablaTecnicas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICIOS -->
+    <div id="panel-servicios" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <span style="font-weight:600">Servicios</span>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalServicio()">+ Agregar servicio</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Servicio</th><th>Duración</th><th>Precio</th><th>Categoría</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="tablaServicios"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TÉCNICA -->
+<div class="modal-backdrop" id="modalTecnica">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tituloTecnica">Nueva técnica</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalTecnica')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre completo</label><input id="tecNombre" placeholder="Nombre de la técnica"></div>
+      <div class="form-group">
+        <label>Salón</label>
+        <select id="tecSalon">
+          <option value="vs">Vicente Suárez</option>
+          <option value="jb">Juan de la Barrera</option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Teléfono (opcional)</label><input id="tecTel" placeholder="55 1234 5678"></div>
+        <div class="form-group"><label>Comisión (%)</label><input id="tecComision" type="number" min="0" max="100" placeholder="40"></div>
+      </div>
+      <div class="form-group" style="flex-direction:row;align-items:center;gap:10px">
+        <input type="checkbox" id="tecActiva" checked style="width:16px;height:16px">
+        <label for="tecActiva" style="margin:0">Técnica activa</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalTecnica')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTecnica()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SERVICIO -->
+<div class="modal-backdrop" id="modalServicio">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tituloServicio">Nuevo servicio</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalServicio')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre del servicio</label><input id="svcNombre" placeholder="Ej: Mano completa gel color"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Precio ($)</label><input id="svcPrecio" type="number" placeholder="350"></div>
+        <div class="form-group"><label>Duración (minutos)</label><input id="svcDuracion" type="number" placeholder="60"></div>
+      </div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <select id="svcCategoria">
+          <option value="manicure">Manicure</option>
+          <option value="pedicure">Pedicure</option>
+          <option value="gel">Gel</option>
+          <option value="acrílico">Acrílico</option>
+          <option value="nail-art">Nail Art</option>
+          <option value="diseño">Diseño especial</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Descripción (opcional)</label><textarea id="svcDesc" placeholder="Descripción del servicio..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalServicio')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarServicio()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+let tecnicas = [], servicios = [], editTecnica = null, editServicio = null;
+
+async function init() {
+  await Promise.all([cargarTecnicas(), cargarServicios()]);
+}
+
+async function cargarTecnicas() {
+  const r = await fetch('/api/config?tipo=tecnicas');
+  const d = await r.json();
+  tecnicas = d.data || [];
+  renderTecnicas();
+}
+async function cargarServicios() {
+  const r = await fetch('/api/config?tipo=servicios');
+  const d = await r.json();
+  servicios = d.data || [];
+  renderServicios();
+}
+
+function renderTecnicas() {
+  const tb = document.getElementById('tablaTecnicas');
+  if(!tecnicas.length) { tb.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">💅</div><p>Sin técnicas. Agrega la primera.</p></div></td></tr>`; return; }
+  tb.innerHTML = tecnicas.map(t => `<tr>
+    <td><strong>${t.nombre}</strong>${t.tel ? `<br><span style="color:var(--text-muted);font-size:12px">${t.tel}</span>` : ''}</td>
+    <td><span class="badge badge-${t.salonId === 'vs' ? 'vs' : 'jb'}">${t.salonId === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera'}</span></td>
+    <td><strong style="color:var(--accent)">${t.comision ? t.comision + '%' : '<span style="color:var(--text-muted)">—</span>'}</strong></td>
+    <td><span class="badge ${t.activa ? 'badge-success' : 'badge-warning'}">${t.activa ? 'Activa' : 'Inactiva'}</span></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick='editarTecnica(${JSON.stringify(t)})'>Editar</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleTecnica('${t.id}',${!t.activa})">${t.activa ? 'Desactivar' : 'Activar'}</button>
+    </td>
+  </tr>`).join('');
+}
+
+function renderServicios() {
+  const tb = document.getElementById('tablaServicios');
+  if(!servicios.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin servicios. Agrega el primero.</p></div></td></tr>`; return; }
+  tb.innerHTML = servicios.map(s => `<tr>
+    <td><strong>${s.nombre}</strong>${s.desc ? `<br><span style="color:var(--text-muted);font-size:12px">${s.desc}</span>` : ''}</td>
+    <td>${s.duracion} min</td>
+    <td style="font-weight:700;color:var(--accent)">$${s.precio}</td>
+    <td><span class="badge badge-accent">${s.categoria}</span></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick='editarServicio(${JSON.stringify(s)})'>Editar</button>
+      <button class="btn btn-ghost btn-sm" onclick="eliminarServicio('${s.id}')" style="color:var(--danger)">Eliminar</button>
+    </td>
+  </tr>`).join('');
+}
+
+function showTab(tab) {
+  ['tecnicas','servicios'].forEach(t => {
+    document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
+    document.getElementById('tab-' + t).className = t === tab ? 'btn btn-secondary' : 'btn btn-ghost';
+  });
+}
+
+// Técnicas CRUD
+function abrirModalTecnica(data = {}) {
+  editTecnica = data.id || null;
+  document.getElementById('tituloTecnica').textContent = editTecnica ? 'Editar técnica' : 'Nueva técnica';
+  document.getElementById('tecNombre').value = data.nombre || '';
+  document.getElementById('tecSalon').value = data.salonId || 'vs';
+  document.getElementById('tecTel').value = data.tel || '';
+  document.getElementById('tecComision').value = data.comision || '';
+  document.getElementById('tecActiva').checked = data.activa !== false;
+  document.getElementById('modalTecnica').classList.add('open');
+}
+function editarTecnica(t) { abrirModalTecnica(t); }
+async function guardarTecnica() {
+  const nombre = document.getElementById('tecNombre').value.trim();
+  if(!nombre) { toast('Escribe el nombre', 'error'); return; }
+  const payload = { id: editTecnica, nombre, salonId: document.getElementById('tecSalon').value, tel: document.getElementById('tecTel').value, comision: parseFloat(document.getElementById('tecComision').value) || 0, activa: document.getElementById('tecActiva').checked };
+  const r = await fetch('/api/config', { method: editTecnica ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'tecnica', ...payload}) });
+  const d = await r.json();
+  if(d.ok) { toast('Guardado', 'success'); cerrarModal('modalTecnica'); await cargarTecnicas(); }
+  else toast(d.error || 'Error', 'error');
+}
+async function toggleTecnica(id, activa) {
+  const t = tecnicas.find(x => x.id === id);
+  await fetch('/api/config', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'tecnica', ...t, activa}) });
+  await cargarTecnicas();
+}
+
+// Servicios CRUD
+function abrirModalServicio(data = {}) {
+  editServicio = data.id || null;
+  document.getElementById('tituloServicio').textContent = editServicio ? 'Editar servicio' : 'Nuevo servicio';
+  document.getElementById('svcNombre').value = data.nombre || '';
+  document.getElementById('svcPrecio').value = data.precio || '';
+  document.getElementById('svcDuracion').value = data.duracion || '';
+  document.getElementById('svcCategoria').value = data.categoria || 'manicure';
+  document.getElementById('svcDesc').value = data.desc || '';
+  document.getElementById('modalServicio').classList.add('open');
+}
+function editarServicio(s) { abrirModalServicio(s); }
+async function guardarServicio() {
+  const nombre = document.getElementById('svcNombre').value.trim();
+  const precio = parseFloat(document.getElementById('svcPrecio').value);
+  const duracion = parseInt(document.getElementById('svcDuracion').value);
+  if(!nombre || !precio || !duracion) { toast('Completa todos los campos', 'error'); return; }
+  const payload = { id: editServicio, nombre, precio, duracion, categoria: document.getElementById('svcCategoria').value, desc: document.getElementById('svcDesc').value };
+  const r = await fetch('/api/config', { method: editServicio ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'servicio', ...payload}) });
+  const d = await r.json();
+  if(d.ok) { toast('Guardado', 'success'); cerrarModal('modalServicio'); await cargarServicios(); }
+  else toast(d.error || 'Error', 'error');
+}
+async function eliminarServicio(id) {
+  if(!confirm('¿Eliminar servicio?')) return;
+  await fetch('/api/config', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'servicio', id}) });
+  await cargarServicios();
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+function toast(msg, type='') {
+  const div = document.createElement('div'); div.className = `toast ${type}`; div.textContent = msg;
+  document.getElementById('toasts').appendChild(div); setTimeout(() => div.remove(), 3000);
+}
+document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', e => { if(e.target===b) b.classList.remove('open'); }));
+
+init();
+</script>
+</body>
+</html>

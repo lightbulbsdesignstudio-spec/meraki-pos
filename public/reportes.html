@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes — N de Nails</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-links">
+    <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
+    <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
+    <a href="/whatsapp.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/reportes.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <a href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+  </div>
+  <div class="nav-salones">
+    <div class="label">Salones</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Reportes</h1>
+    <div class="topbar-actions">
+      <select id="periodoSelect" onchange="cargarReportes()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface)">
+        <option value="semana">Esta semana</option>
+        <option value="mes" selected>Este mes</option>
+        <option value="mes_anterior">Mes anterior</option>
+        <option value="total">Todo el tiempo</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- KPIs generales -->
+    <div class="grid-4" id="kpis" style="margin-bottom:24px"></div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <!-- Por salón -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:600">Por salón</span></div>
+        <div class="card-body" id="reporteSalones"></div>
+      </div>
+      <!-- Métodos de pago -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:600">Métodos de pago</span></div>
+        <div class="card-body" id="reportePagos"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header"><span style="font-weight:600">Por técnica — ingresos y comisiones</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Técnica</th><th>Salón</th><th>Citas</th><th>Ingresos</th><th>Comisión</th><th>A pagar</th></tr></thead>
+          <tbody id="reporteTecnicasTabla"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <!-- Servicios más solicitados -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:600">Servicios más solicitados</span></div>
+        <div class="card-body" id="reporteServicios"></div>
+      </div>
+      <!-- Ocupación y cancelaciones -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:600">Ocupación y cancelaciones</span></div>
+        <div class="card-body" id="reporteOcupacion"></div>
+      </div>
+    </div>
+
+    <!-- Clientes top -->
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Clientas más frecuentes</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Clienta</th><th>Visitas</th><th>Gasto estimado</th><th>Último servicio</th><th>Salón</th></tr></thead>
+          <tbody id="reporteClientes"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+<script>
+async function cargarReportes() {
+  const periodo = document.getElementById('periodoSelect').value;
+  try {
+    const r = await fetch(`/api/reportes?periodo=${periodo}`);
+    const d = await r.json();
+    renderReportes(d.data || {});
+  } catch(e) { console.error(e); }
+}
+
+function renderReportes(d) {
+  const { kpis = {}, salones = [], tecnicas = [], servicios = [], ocupacion = {}, clientes = [], pagos = {} } = d;
+
+  // KPIs
+  document.getElementById('kpis').innerHTML = `
+    <div class="stat-card stat-total">
+      <div class="stat-label">Citas completadas</div>
+      <div class="stat-value">${kpis.citasCompletadas || 0}</div>
+      <div class="stat-sub">${kpis.periodoLabel || ''}</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid var(--success)">
+      <div class="stat-label">Ingresos estimados</div>
+      <div class="stat-value" style="color:var(--success)">$${(kpis.ingresos || 0).toLocaleString()}</div>
+      <div class="stat-sub">basado en precios de servicios</div>
+    </div>
+    <div class="stat-card stat-vs">
+      <div class="stat-label">Ticket promedio</div>
+      <div class="stat-value" style="color:var(--vs)">$${kpis.ticketPromedio || 0}</div>
+    </div>
+    <div class="stat-card stat-jb">
+      <div class="stat-label">Clientas nuevas</div>
+      <div class="stat-value" style="color:var(--jb)">${kpis.clientasNuevas || 0}</div>
+    </div>
+  `;
+
+  // Por salón
+  document.getElementById('reporteSalones').innerHTML = salones.length ? salones.map(s => `
+    <div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span class="badge badge-${s.id === 'vs' ? 'vs' : 'jb'}">${s.nombre}</span>
+        <strong>${s.citas} citas · $${s.ingresos.toLocaleString()}</strong>
+      </div>
+      <div style="background:var(--surface-2);border-radius:4px;height:8px;overflow:hidden">
+        <div style="height:100%;background:var(--${s.id === 'vs' ? 'vs' : 'jb'});width:${s.pct}%;border-radius:4px"></div>
+      </div>
+    </div>`).join('') : '<div class="empty"><p>Sin datos</p></div>';
+
+  // Por técnica — tabla con comisiones
+  const tbTec = document.getElementById('reporteTecnicasTabla');
+  if (!tecnicas.length) {
+    tbTec.innerHTML = `<tr><td colspan="6"><div class="empty"><p>Sin datos</p></div></td></tr>`;
+  } else {
+    tbTec.innerHTML = tecnicas.map(t => `<tr>
+      <td><strong>${t.nombre}</strong></td>
+      <td><span class="badge badge-${t.salonId === 'vs' ? 'vs' : 'jb'}">${t.salonId === 'vs' ? 'VS' : 'JB'}</span></td>
+      <td><strong>${t.citas}</strong></td>
+      <td style="font-weight:700;color:var(--accent)">$${t.ingresos.toLocaleString()}</td>
+      <td style="color:var(--text-muted)">${t.comisionPct ? t.comisionPct + '%' : '—'}</td>
+      <td style="font-weight:700;color:var(--success)">${t.comisionMonto ? '$' + t.comisionMonto.toLocaleString() : '—'}</td>
+    </tr>`).join('');
+  }
+
+  // Métodos de pago
+  const totalPagos = (pagos.efectivo||0) + (pagos.transferencia||0) + (pagos.tarjeta||0) + (pagos.sinRegistro||0);
+  const pct = v => totalPagos ? Math.round(v/totalPagos*100) : 0;
+  document.getElementById('reportePagos').innerHTML = totalPagos ? `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${[
+        { label: '💵 Efectivo', val: pagos.efectivo||0, color: 'var(--success)' },
+        { label: '📲 Transferencia', val: pagos.transferencia||0, color: 'var(--vs)' },
+        { label: '💳 Tarjeta', val: pagos.tarjeta||0, color: 'var(--jb)' },
+        ...(pagos.sinRegistro ? [{ label: 'Sin registro', val: pagos.sinRegistro, color: 'var(--border)' }] : []),
+      ].map(x => `
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px">
+            <span>${x.label}</span>
+            <span><strong>$${x.val.toLocaleString()}</strong> <span style="color:var(--text-muted)">(${pct(x.val)}%)</span></span>
+          </div>
+          <div style="background:var(--surface-2);border-radius:4px;height:6px">
+            <div style="height:100%;background:${x.color};width:${pct(x.val)}%;border-radius:4px"></div>
+          </div>
+        </div>`).join('')}
+    </div>` : '<div class="empty"><p>Sin cobros registrados en el período</p></div>';
+
+  // Servicios
+  document.getElementById('reporteServicios').innerHTML = servicios.length ? servicios.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${i+1}</div>
+      <div style="flex:1"><strong style="font-size:14px">${s.nombre}</strong></div>
+      <div style="text-align:right">
+        <strong>${s.count} veces</strong>
+        <div style="font-size:12px;color:var(--text-muted)">$${s.precio}/c</div>
+      </div>
+    </div>`).join('') : '<div class="empty"><p>Sin datos</p></div>';
+
+  // Ocupación
+  const { completadas = 0, canceladas = 0, pendientes = 0, total = 0 } = ocupacion;
+  const pctComp = total ? Math.round(completadas/total*100) : 0;
+  const pctCanc = total ? Math.round(canceladas/total*100) : 0;
+  document.getElementById('reporteOcupacion').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${[
+        { label: 'Completadas', val: completadas, pct: pctComp, color: 'var(--success)' },
+        { label: 'Canceladas', val: canceladas, pct: pctCanc, color: 'var(--danger)' },
+        { label: 'Pendientes', val: pendientes, pct: total ? Math.round(pendientes/total*100) : 0, color: 'var(--warning)' },
+      ].map(x => `
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px">
+            <span>${x.label}</span>
+            <span><strong>${x.val}</strong> (${x.pct}%)</span>
+          </div>
+          <div style="background:var(--surface-2);border-radius:4px;height:6px">
+            <div style="height:100%;background:${x.color};width:${x.pct}%;border-radius:4px"></div>
+          </div>
+        </div>`).join('')}
+      <div style="font-size:13px;color:var(--text-muted);padding-top:4px">Total: ${total} citas en el período</div>
+    </div>`;
+
+  // Clientes top
+  const tb = document.getElementById('reporteClientes');
+  if(!clientes.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin datos</p></div></td></tr>`; return; }
+  tb.innerHTML = clientes.map(c => `<tr>
+    <td><strong>${c.nombre}</strong></td>
+    <td><strong>${c.visitas}</strong></td>
+    <td style="color:var(--accent);font-weight:600">$${c.gasto.toLocaleString()}</td>
+    <td style="color:var(--text-muted)">${c.ultimoServicio || '—'}</td>
+    <td><span class="badge badge-${c.salon === 'vs' ? 'vs' : 'jb'}">${c.salon === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera'}</span></td>
+  </tr>`).join('');
+}
+
+function toast(msg, type='') {
+  const div = document.createElement('div'); div.className = `toast ${type}`; div.textContent = msg;
+  document.getElementById('toasts').appendChild(div); setTimeout(() => div.remove(), 3000);
+}
+
+cargarReportes();
+</script>
+</body>
+</html>

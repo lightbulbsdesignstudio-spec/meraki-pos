@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp IA — N de Nails</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-links">
+    <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
+    <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
+    <a href="/whatsapp.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/reportes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <a href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+  </div>
+  <div class="nav-salones">
+    <div class="label">Salones</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>WhatsApp IA</h1>
+    <div class="topbar-actions">
+      <div id="statusIA" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--success)">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--success)"></div>
+        IA activa
+      </div>
+      <span id="badgeDesignos" class="badge badge-accent" style="display:none">0 diseños pendientes</span>
+    </div>
+  </div>
+
+  <div class="page" style="padding:0;height:calc(100vh - 65px)">
+    <div class="wa-inbox">
+
+      <!-- Lista de conversaciones -->
+      <div class="wa-list">
+        <div class="wa-list-header">
+          <span>Conversaciones</span>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-ghost btn-sm active-tab" id="tabTodos" onclick="setTabWA('todos')">Todos</button>
+            <button class="btn btn-ghost btn-sm" id="tabCitas" onclick="setTabWA('citas')">📅 Citas</button>
+            <button class="btn btn-ghost btn-sm" id="tabDisenos" onclick="setTabWA('disenos')" style="color:var(--accent)">✨ Diseños</button>
+          </div>
+        </div>
+        <div id="waList"></div>
+      </div>
+
+      <!-- Detalle / conversación activa -->
+      <div class="wa-detail" id="waDetail">
+        <div class="wa-detail-header">
+          <div id="waDetailHeader" style="color:var(--text-muted);font-size:14px">
+            Selecciona una conversación
+          </div>
+        </div>
+        <div class="wa-messages" id="waMessages">
+          <div class="empty" style="margin:auto">
+            <div class="empty-icon">💬</div>
+            <h3>WhatsApp IA</h3>
+            <p>La IA responde automáticamente mensajes de citas,<br>precios y preguntas frecuentes.</p>
+            <p style="margin-top:8px">Los diseños especiales llegan aquí para que tú<br>revises y cotices.</p>
+          </div>
+        </div>
+
+        <!-- Panel cotización de diseño -->
+        <div id="waCotizarPanel" style="display:none">
+          <div class="wa-design-card">
+            <h4>💅 Análisis de diseño — Claude IA</h4>
+            <div class="analysis" id="iaAnalisis"></div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div>
+                <div style="font-size:12px;color:var(--text-muted)">Precio sugerido</div>
+                <div class="price-range" id="iaPrecioRango"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wa-cotizar">
+            <input type="number" id="cotizarPrecio" placeholder="Tu precio final ($)">
+            <textarea id="cotizarMsg" placeholder="Mensaje para la clienta..." style="resize:none;height:38px;padding:9px 12px;flex:2"></textarea>
+            <button class="btn btn-primary" onclick="enviarCotizacion()">Enviar cotización</button>
+          </div>
+        </div>
+
+        <!-- Booking widget (agendar cita desde chat) -->
+        <div id="waBookingWidget" style="display:none">
+          <div class="wa-booking-widget">
+            <h4 style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <span>📅 Agendar cita</span>
+              <button class="btn btn-ghost btn-sm" onclick="cerrarBookingWidget()" style="font-size:11px;padding:4px 8px">Cancelar</button>
+            </h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+              <div>
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;font-weight:500">Fecha</label>
+                <input type="date" id="bwFecha" onchange="cargarSlots()">
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;font-weight:500">Técnica</label>
+                <select id="bwTecnica" onchange="cargarSlots()">
+                  <option value="">Cualquiera</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;font-weight:500">Horario disponible</label>
+              <select id="bwHora">
+                <option value="">— Selecciona fecha primero —</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;font-size:13.5px" onclick="crearCitaDesdeWA()">Confirmar y crear cita</button>
+          </div>
+          <div style="padding:0 16px 10px">
+            <button class="btn btn-ghost btn-sm" onclick="cerrarBookingWidget()" style="font-size:12px;color:var(--text-muted)">Responder manualmente en cambio</button>
+          </div>
+        </div>
+
+        <!-- Barra de respuesta manual -->
+        <div class="wa-reply-bar" id="waReplyBar">
+          <input id="replyInput" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)enviarManual()">
+          <button class="btn btn-ghost btn-sm" onclick="mostrarBookingWidget()" title="Agendar cita" style="padding:8px 10px;font-size:16px;flex-shrink:0">📅</button>
+          <button class="btn btn-secondary btn-sm" onclick="usarPlantilla()">Plantillas</button>
+          <button class="btn btn-primary btn-sm" onclick="enviarManual()">Enviar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PLANTILLAS -->
+<div class="modal-backdrop" id="modalPlantillas">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Plantillas de respuesta</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalPlantillas')">✕</button>
+    </div>
+    <div class="modal-body" id="listaPlantillas"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const PLANTILLAS = [
+  { label: 'Confirmación de cita', texto: 'Hola! Tu cita está confirmada para [FECHA] a las [HORA] con [TÉCNICA] en [SALÓN]. ¡Te esperamos! 💅' },
+  { label: 'Recordatorio', texto: 'Hola [NOMBRE]! Te recuerdo tu cita mañana a las [HORA] con [TÉCNICA] en [SALÓN]. ¿Confirmas? ✨' },
+  { label: 'Cancelación', texto: 'Hola [NOMBRE], lamentamos informarte que tu cita del [FECHA] fue cancelada. ¿Quieres reagendarla? 📅' },
+  { label: 'Precios generales', texto: 'Hola! Nuestros precios van desde $[MIN] hasta $[MAX] dependiendo del servicio. ¿Te gustaría agendar una cita? 💅' },
+  { label: 'Sin disponibilidad', texto: 'Hola! En ese horario ya no tenemos disponibilidad. ¿Te funciona el [DIA] a las [HORA]? ✨' },
+  { label: 'Diseño recibido', texto: '¡Hola! Recibimos tu diseño, lo revisamos y en unos minutos te mandamos el precio. 💅✨' },
+];
+
+const HORAS = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00'];
+
+const AVATAR_PALETTE = [
+  { bg: '#EDE9FE', color: '#7C3AED' },
+  { bg: '#DBEAFE', color: '#2563EB' },
+  { bg: '#D1FAE5', color: '#059669' },
+  { bg: '#FEF3C7', color: '#D97706' },
+  { bg: '#FCE7F3', color: '#DB2777' },
+  { bg: '#FFEDD5', color: '#EA580C' },
+];
+
+let conversaciones = [];
+let convoActiva = null;
+let tabActual = 'todos';
+let tecnicas = [];
+
+function initiales(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ').filter(Boolean);
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function avatarPalette(name) {
+  if (!name) return AVATAR_PALETTE[0];
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_PALETTE.length;
+  return AVATAR_PALETTE[Math.abs(hash)];
+}
+
+async function init() {
+  await Promise.all([cargarConversaciones(), cargarTecnicas()]);
+  renderLista();
+  setInterval(async () => {
+    await cargarConversaciones();
+    renderLista();
+    if (convoActiva) {
+      const fresh = conversaciones.find(c => c.id === convoActiva.id);
+      if (fresh && JSON.stringify(fresh.mensajes) !== JSON.stringify(convoActiva.mensajes)) {
+        convoActiva = fresh;
+        renderDetalle();
+      }
+    }
+  }, 10000);
+}
+
+async function cargarConversaciones() {
+  try {
+    const r = await fetch('/api/whatsapp?tipo=queue');
+    const d = await r.json();
+    conversaciones = d.data || [];
+    const pendientes = conversaciones.filter(c => c.tipo === 'diseno' && c.estado === 'pendiente').length;
+    const badge = document.getElementById('badgeDesignos');
+    if (pendientes > 0) {
+      badge.style.display = '';
+      badge.textContent = `${pendientes} diseño${pendientes > 1 ? 's' : ''} pendiente${pendientes > 1 ? 's' : ''}`;
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (e) {}
+}
+
+async function cargarTecnicas() {
+  try {
+    const r = await fetch('/api/config?tipo=tecnicas');
+    const d = await r.json();
+    tecnicas = (d.data || []).filter(t => t.activa !== false);
+  } catch (e) {}
+}
+
+function renderLista() {
+  const filtros = {
+    todos:   () => true,
+    citas:   c => c.tipo === 'cita',
+    disenos: c => c.tipo === 'diseno',
+  };
+  const lista = conversaciones.filter(filtros[tabActual] || (() => true));
+  const div = document.getElementById('waList');
+
+  if (!lista.length) {
+    const icons = { todos: '💬', citas: '📅', disenos: '💅' };
+    const msgs  = { todos: 'Sin mensajes aún', citas: 'Sin solicitudes de cita', disenos: 'Sin diseños pendientes' };
+    div.innerHTML = `<div class="empty" style="padding:48px 16px"><div class="empty-icon" style="font-size:28px">${icons[tabActual]}</div><p style="font-size:13px;color:var(--text-muted)">${msgs[tabActual]}</p></div>`;
+    return;
+  }
+
+  div.innerHTML = lista.map(c => {
+    const activa   = convoActiva?.id === c.id;
+    const esDiseno = c.tipo === 'diseno';
+    const esCita   = c.tipo === 'cita';
+    const lastMsg  = c.mensajes?.[c.mensajes.length - 1];
+    const lastBot  = lastMsg?.tipo === 'bot';
+    const tiempo   = c.timestamp ? formatTiempo(c.timestamp) : '';
+    const ini      = initiales(c.nombre || c.phone);
+    const pal      = avatarPalette(c.nombre || c.phone);
+    const avatarStyle = activa ? '' : `background:${pal.bg};color:${pal.color};border-color:transparent`;
+    const preview  = esDiseno ? '📸 Diseño especial'
+                   : esCita   ? '📅 Solicitud de cita'
+                   : (c.ultimoMensaje || lastMsg?.texto || '...');
+    const badges = [
+      c.estado === 'pendiente' ? '<span class="wa-unread">!</span>' : '',
+      lastBot  ? '<span class="wa-ia-badge">IA</span>' : '',
+      esDiseno ? '<span class="badge badge-accent" style="font-size:10px;padding:1px 5px">diseño</span>' : '',
+      esCita   ? '<span style="background:#DBEAFE;color:#2563EB;border-radius:10px;font-size:10px;padding:1px 5px;font-weight:600">cita</span>' : '',
+    ].filter(Boolean).join('');
+
+    return `<div class="wa-item ${activa ? 'active' : ''} ${esDiseno ? 'design' : ''}" onclick="seleccionar('${c.id}')">
+      <div class="wa-avatar" style="${avatarStyle}">${ini}</div>
+      <div class="wa-item-body">
+        <div class="wa-item-name">${c.nombre || c.phone || 'Desconocido'}</div>
+        <div class="wa-item-preview">${escHtml(preview)}</div>
+        <div class="wa-item-meta">
+          <span class="wa-item-time">${tiempo}</span>
+          <div style="display:flex;align-items:center;gap:4px">${badges}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setTabWA(tab) {
+  tabActual = tab;
+  const map = { todos: 'tabTodos', citas: 'tabCitas', disenos: 'tabDisenos' };
+  Object.entries(map).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'btn btn-ghost btn-sm';
+    if (key === tab) el.classList.add('active-tab');
+  });
+  renderLista();
+}
+
+async function seleccionar(id) {
+  convoActiva = conversaciones.find(c => c.id === id);
+  if (!convoActiva) return;
+  renderLista();
+  renderDetalle();
+  fetch('/api/whatsapp', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, accion: 'leer' }) }).catch(() => {});
+}
+
+function renderDetalle() {
+  const c = convoActiva;
+  const ini = initiales(c.nombre || c.phone);
+  const pal = avatarPalette(c.nombre || c.phone);
+
+  const tipoPill = c.tipo === 'cita'
+    ? '<span style="background:#DBEAFE;color:#2563EB;border-radius:10px;font-size:11px;padding:2px 8px;font-weight:600">📅 Cita</span>'
+    : c.tipo === 'diseno'
+    ? '<span class="badge badge-accent" style="font-size:11px">💅 Diseño</span>'
+    : c.tipo === 'precio'
+    ? '<span style="background:#D1FAE5;color:#059669;border-radius:10px;font-size:11px;padding:2px 8px;font-weight:600">💰 Precio</span>'
+    : '';
+
+  document.getElementById('waDetailHeader').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="wa-avatar" style="width:40px;height:40px;font-size:15px;background:${pal.bg};color:${pal.color};border-color:transparent">${ini}</div>
+      <div>
+        <div style="font-weight:600;font-size:14px">${escHtml(c.nombre || c.phone)}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="font-size:12px;color:var(--text-muted)">${c.phone || ''}</span>
+          ${tipoPill}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      ${c.phone ? `<a href="https://wa.me/${c.phone.replace(/\D/g,'')}" target="_blank" class="btn btn-success btn-sm" style="font-size:12px">Abrir en WA</a>` : ''}
+    </div>`;
+
+  // Mensajes
+  const msgs = c.mensajes || [];
+  if (!msgs.length) {
+    document.getElementById('waMessages').innerHTML = `<div class="empty" style="margin:auto"><div class="empty-icon" style="font-size:32px">💬</div><p style="color:var(--text-muted)">Sin mensajes aún</p></div>`;
+  } else {
+    document.getElementById('waMessages').innerHTML = msgs.map(m => {
+      const isIn  = m.tipo === 'in';
+      const isBot = m.tipo === 'bot';
+      const align = isIn ? 'flex-start' : 'flex-end';
+      const cls   = isIn ? 'msg msg-in' : isBot ? 'msg msg-bot' : 'msg msg-out';
+      const img   = m.mediaUrl ? `<img src="${m.mediaUrl}" alt="diseño">` : '';
+      const iaBadge = isBot ? `<span class="wa-ia-badge" style="display:inline-block;margin-bottom:4px;font-size:10px">🤖 IA respondió</span><br>` : '';
+      return `<div style="display:flex;flex-direction:column;align-items:${align}">
+        <div class="${cls}">${iaBadge}${img}${escHtml(m.texto || '')}</div>
+        <div class="msg-time" style="${!isIn ? 'text-align:right' : ''}">${formatTiempo(m.timestamp)}</div>
+      </div>`;
+    }).join('');
+  }
+  setTimeout(() => { const el = document.getElementById('waMessages'); el.scrollTop = el.scrollHeight; }, 50);
+
+  // Paneles inferiores
+  document.getElementById('waCotizarPanel').style.display = 'none';
+  document.getElementById('waBookingWidget').style.display = 'none';
+  document.getElementById('waReplyBar').style.display = '';
+
+  if (c.tipo === 'diseno' && c.estado === 'pendiente') {
+    document.getElementById('waCotizarPanel').style.display = '';
+    document.getElementById('waReplyBar').style.display = 'none';
+    document.getElementById('iaAnalisis').textContent = c.analisisIA || 'Analizando diseño...';
+    document.getElementById('iaPrecioRango').textContent = c.precioSugerido || 'Calculando precio...';
+    document.getElementById('cotizarMsg').value = `Hola! Tu diseño queda en $[precio]. ¿Te agendamos? 💅`;
+  } else if (c.tipo === 'cita' && c.estado === 'pendiente') {
+    mostrarBookingWidget();
+  }
+}
+
+async function mostrarBookingWidget() {
+  document.getElementById('waBookingWidget').style.display = '';
+  document.getElementById('waReplyBar').style.display = 'none';
+
+  const manana = new Date();
+  manana.setDate(manana.getDate() + 1);
+  document.getElementById('bwFecha').value = manana.toISOString().split('T')[0];
+
+  const tecSelect = document.getElementById('bwTecnica');
+  tecSelect.innerHTML = '<option value="">Cualquiera</option>' +
+    tecnicas.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+
+  await cargarSlots();
+}
+
+function cerrarBookingWidget() {
+  document.getElementById('waBookingWidget').style.display = 'none';
+  document.getElementById('waReplyBar').style.display = '';
+}
+
+async function cargarSlots() {
+  const fecha     = document.getElementById('bwFecha').value;
+  const tecnicaId = document.getElementById('bwTecnica').value;
+  const horaSelect = document.getElementById('bwHora');
+  if (!fecha) { horaSelect.innerHTML = '<option value="">— Selecciona fecha primero —</option>'; return; }
+
+  horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
+  try {
+    const url = `/api/citas?fecha=${fecha}${tecnicaId ? '&tecnicaId=' + tecnicaId : ''}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const ocupadas = new Set((d.data || []).filter(c => c.estado !== 'cancelada').map(c => c.hora));
+    const libres = HORAS.filter(h => !ocupadas.has(h));
+    horaSelect.innerHTML = libres.length
+      ? '<option value="">Seleccionar horario</option>' + libres.map(h => `<option value="${h}">${h}</option>`).join('')
+      : '<option value="">Sin disponibilidad ese día</option>';
+  } catch (e) {
+    horaSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+  }
+}
+
+async function crearCitaDesdeWA() {
+  if (!convoActiva) return;
+  const fecha     = document.getElementById('bwFecha').value;
+  const tecnicaId = document.getElementById('bwTecnica').value;
+  const hora      = document.getElementById('bwHora').value;
+  if (!fecha || !hora) { toast('Selecciona fecha y horario', 'error'); return; }
+
+  const r = await fetch('/api/citas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fecha, hora, tecnicaId,
+      clienteId: convoActiva.clienteId || convoActiva.phone || 'wa-' + convoActiva.id,
+      salonId: '', servicioId: '', estado: 'pendiente',
+      notas: `Agendada desde WhatsApp — ${convoActiva.nombre || convoActiva.phone}`,
+    }),
+  });
+  const d = await r.json();
+  if (!d.ok) { toast('Error al crear cita', 'error'); return; }
+
+  toast('Cita creada', 'success');
+  const nombre = convoActiva.nombre?.split(' ')[0] || '';
+  const msg = `${nombre ? nombre + '! ' : '¡Listo! '}Tu cita quedó agendada para el ${fecha} a las ${hora}. ¡Te esperamos! 💅`;
+  fetch('/api/whatsapp', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accion: 'responder', id: convoActiva.id, mensaje: msg }),
+  }).catch(() => {});
+
+  cerrarBookingWidget();
+  await cargarConversaciones();
+  convoActiva = conversaciones.find(c => c.id === convoActiva.id) || convoActiva;
+  renderLista();
+  renderDetalle();
+}
+
+async function enviarCotizacion() {
+  const precio = document.getElementById('cotizarPrecio').value;
+  const msg    = document.getElementById('cotizarMsg').value.replace('[precio]', precio);
+  if (!precio) { toast('Escribe el precio', 'error'); return; }
+  await fetch('/api/whatsapp', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accion: 'cotizar', id: convoActiva.id, precio, mensaje: msg }),
+  });
+  toast('Cotización enviada', 'success');
+  await cargarConversaciones();
+  renderLista();
+  if (convoActiva) { convoActiva = conversaciones.find(c => c.id === convoActiva.id); renderDetalle(); }
+}
+
+async function enviarManual() {
+  const txt = document.getElementById('replyInput').value.trim();
+  if (!txt || !convoActiva) return;
+  document.getElementById('replyInput').value = '';
+  await fetch('/api/whatsapp', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accion: 'responder', id: convoActiva.id, mensaje: txt }),
+  });
+  await cargarConversaciones();
+  if (convoActiva) { convoActiva = conversaciones.find(c => c.id === convoActiva.id); renderDetalle(); }
+}
+
+function usarPlantilla() {
+  document.getElementById('listaPlantillas').innerHTML = PLANTILLAS.map((p, i) => `
+    <div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:background var(--t)"
+         onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''"
+         onclick="aplicarPlantilla(${i})">
+      <div style="font-weight:600;font-size:13.5px;margin-bottom:4px">${p.label}</div>
+      <div style="font-size:12.5px;color:var(--text-muted)">${p.texto}</div>
+    </div>`).join('');
+  document.getElementById('modalPlantillas').classList.add('open');
+}
+
+function aplicarPlantilla(i) {
+  document.getElementById('replyInput').value = PLANTILLAS[i].texto;
+  cerrarModal('modalPlantillas');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatTiempo(ts) {
+  if (!ts) return '';
+  const d    = new Date(ts);
+  const diff = Date.now() - d;
+  if (diff < 60000)    return 'ahora';
+  if (diff < 3600000)  return `${Math.floor(diff / 60000)}m`;
+  if (diff < 86400000) return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type = '') {
+  const div = document.createElement('div');
+  div.className = `toast ${type}`;
+  div.textContent = msg;
+  document.getElementById('toasts').appendChild(div);
+  setTimeout(() => div.remove(), 3000);
+}
+
+document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open'); }));
+
+init();
+</script>
+</body>
+</html>

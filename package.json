@@ -1,0 +1,18 @@
+{
+  "name": "nnails-app",
+  "version": "1.0.0",
+  "description": "N de Nails — Sistema de gestión de salones",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@upstash/redis": "^1.34.3",
+    "twilio": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

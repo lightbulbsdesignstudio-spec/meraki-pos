@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes — N de Nails</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-links">
+    <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
+    <a href="/clientes.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
+    <a href="/whatsapp.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/reportes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <a href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+  </div>
+  <div class="nav-salones">
+    <div class="label">Salones</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
+    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Clientes</h1>
+    <div class="topbar-actions">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="busqueda" placeholder="Buscar por nombre o teléfono..." oninput="filtrar()">
+      </div>
+      <select id="filtroEstado" onchange="filtrar()" style="max-width:160px">
+        <option value="">Todas</option>
+        <option value="vip">⭐ VIP (5+ visitas)</option>
+        <option value="riesgo">⚠️ En riesgo (60+ días)</option>
+        <option value="nuevas">✨ Nuevas este mes</option>
+      </select>
+      <button class="btn btn-primary" onclick="abrirModal()">+ Nueva clienta</button>
+    </div>
+  </div>
+
+  <div class="page">
+    <div id="statsClientes" class="grid-4" style="margin-bottom:24px"></div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Clienta</th>
+            <th>Teléfono</th>
+            <th>Última visita</th>
+            <th>Visitas</th>
+            <th>Total gastado</th>
+            <th>Salón</th>
+            <th>Acciones</th>
+          </tr></thead>
+          <tbody id="tablaClientes"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-backdrop" id="modalCliente">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tituloModal">Nueva clienta</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalCliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre completo</label><input id="cliNombre" placeholder="Nombre de la clienta"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Teléfono (WhatsApp)</label><input id="cliTel" placeholder="55 1234 5678"></div>
+        <div class="form-group"><label>Email (opcional)</label><input id="cliEmail" type="email" placeholder="correo@ejemplo.com"></div>
+      </div>
+      <div class="form-group"><label>Salón preferido</label>
+        <select id="cliSalon">
+          <option value="">Sin preferencia</option>
+          <option value="vs">Vicente Suárez</option>
+          <option value="jb">Juan de la Barrera</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Notas (alergias, preferencias, diseños favoritos)</label><textarea id="cliNotas" placeholder="Ej: gel color + diseño en anular, alérgica al acrílico..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalCliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL -->
+<div class="modal-backdrop" id="modalHistorial">
+  <div class="modal" style="width:min(640px,95vw)">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="historialAvatar" class="wa-avatar" style="width:40px;height:40px;font-size:15px;flex-shrink:0"></div>
+        <div>
+          <div id="historialTitulo" style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600"></div>
+          <div id="historialSub" style="font-size:12px;color:var(--text-muted);margin-top:2px"></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalHistorial')">✕</button>
+    </div>
+    <div id="historialStats" style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)"></div>
+    <div class="modal-body" id="historialBody" style="padding-top:16px"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const AVATAR_PALETTE = [
+  { bg: '#EDE9FE', color: '#7C3AED' },
+  { bg: '#DBEAFE', color: '#2563EB' },
+  { bg: '#D1FAE5', color: '#059669' },
+  { bg: '#FEF3C7', color: '#D97706' },
+  { bg: '#FCE7F3', color: '#DB2777' },
+  { bg: '#FFEDD5', color: '#EA580C' },
+];
+
+function initiales(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(' ').filter(Boolean);
+  return parts.length === 1 ? parts[0][0].toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+function avatarPalette(name) {
+  if (!name) return AVATAR_PALETTE[0];
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) % AVATAR_PALETTE.length;
+  return AVATAR_PALETTE[Math.abs(h)];
+}
+
+let clientes = [], citas = [], servicios = [], tecnicos = [];
+let editId = null;
+
+async function init() {
+  await Promise.all([cargarClientes(), cargarCitas(), cargarConfig()]);
+  renderStats();
+  renderTabla(clientes);
+}
+
+async function cargarClientes() {
+  try { const r = await fetch('/api/clientes'); const d = await r.json(); clientes = d.data || []; } catch {}
+}
+async function cargarCitas() {
+  try { const r = await fetch('/api/citas?all=1'); const d = await r.json(); citas = d.data || []; } catch {}
+}
+async function cargarConfig() {
+  try {
+    const [rt, rs] = await Promise.all([fetch('/api/config?tipo=tecnicas'), fetch('/api/config?tipo=servicios')]);
+    tecnicos = (await rt.json()).data || [];
+    servicios = (await rs.json()).data || [];
+  } catch {}
+}
+
+function citasDe(clienteId) {
+  return citas.filter(c => c.clienteId === clienteId && c.estado !== 'cancelada')
+              .sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+
+function totalGastado(citasCli) {
+  return citasCli.reduce((sum, c) => {
+    if (c.totalCobrado != null) return sum + Number(c.totalCobrado);
+    const svc = servicios.find(s => s.id === c.servicioId);
+    return sum + (svc ? Number(svc.precio) : 0);
+  }, 0);
+}
+
+function diasDesdeUltima(citasCli) {
+  if (!citasCli.length) return null;
+  const ultima = new Date(citasCli[0].fecha + 'T12:00:00');
+  return Math.floor((Date.now() - ultima) / 86400000);
+}
+
+function frecuenciaPromedio(citasCli) {
+  if (citasCli.length < 2) return null;
+  const sorted = [...citasCli].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  let totalDias = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const d1 = new Date(sorted[i - 1].fecha + 'T12:00:00');
+    const d2 = new Date(sorted[i].fecha + 'T12:00:00');
+    totalDias += (d2 - d1) / 86400000;
+  }
+  return Math.round(totalDias / (sorted.length - 1));
+}
+
+function renderStats() {
+  const total = clientes.length;
+  const hoy = new Date();
+  const nuevas = clientes.filter(c => {
+    if (!c.creadoEn) return false;
+    const d = new Date(c.creadoEn);
+    return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
+  }).length;
+
+  // LTV promedio (solo clientes con al menos 1 cita)
+  const conCitas = clientes.filter(c => citasDe(c.id).length > 0);
+  const ltvPromedio = conCitas.length
+    ? Math.round(conCitas.reduce((s, c) => s + totalGastado(citasDe(c.id)), 0) / conCitas.length)
+    : 0;
+
+  // En riesgo: tienen historial pero no visitan hace 60+ días
+  const enRiesgo = clientes.filter(c => {
+    const cc = citasDe(c.id);
+    const dias = diasDesdeUltima(cc);
+    return dias !== null && dias >= 60;
+  }).length;
+
+  document.getElementById('statsClientes').innerHTML = `
+    <div class="stat-card stat-total">
+      <div class="stat-label">Total clientas</div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-sub">${conCitas.length} con historial</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid var(--success)">
+      <div class="stat-label">Nuevas este mes</div>
+      <div class="stat-value" style="color:var(--success)">${nuevas}</div>
+      <div class="stat-sub">registros nuevos</div>
+    </div>
+    <div class="stat-card stat-vs">
+      <div class="stat-label">LTV promedio</div>
+      <div class="stat-value" style="color:var(--vs)">$${ltvPromedio.toLocaleString('es-MX')}</div>
+      <div class="stat-sub">gasto por clienta</div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid var(--danger)">
+      <div class="stat-label">En riesgo de perder</div>
+      <div class="stat-value" style="color:var(--danger)">${enRiesgo}</div>
+      <div class="stat-sub">sin visita en 60+ días</div>
+    </div>`;
+}
+
+function renderTabla(lista) {
+  const tb = document.getElementById('tablaClientes');
+  if (!lista.length) {
+    tb.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">💅</div><h3>Sin resultados</h3><p>Agrega tu primera clienta o ajusta el filtro.</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = lista.map(c => {
+    const cc = citasDe(c.id);
+    const gasto = totalGastado(cc);
+    const dias = diasDesdeUltima(cc);
+    const freq = frecuenciaPromedio(cc);
+    const pal = avatarPalette(c.nombre);
+    const ini = initiales(c.nombre);
+    const vip = cc.length >= 5;
+
+    // Badge última visita
+    let visitaBadge = '<span style="color:var(--text-light)">—</span>';
+    if (dias !== null) {
+      const color = dias < 30 ? 'var(--success)' : dias < 60 ? 'var(--warning)' : 'var(--danger)';
+      const bg    = dias < 30 ? 'var(--success-light)' : dias < 60 ? 'var(--warning-light)' : 'var(--danger-light)';
+      visitaBadge = `<div>
+        <div style="font-size:13px;font-weight:500;color:${color}">${cc[0].fecha}</div>
+        <div style="font-size:11px;margin-top:2px;background:${bg};color:${color};border-radius:10px;padding:1px 7px;display:inline-block">hace ${dias}d</div>
+      </div>`;
+    }
+
+    // Badge salón
+    const salonId = c.salonFrecuente || cc[0]?.salonId;
+    const salonBadge = salonId
+      ? `<span class="badge badge-${salonId === 'vs' ? 'vs' : 'jb'}">${salonId === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera'}</span>`
+      : '<span style="color:var(--text-light)">—</span>';
+
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:${pal.bg};border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:${pal.color};flex-shrink:0">${ini}</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <strong>${c.nombre}</strong>
+              ${vip ? '<span style="background:#FEF3C7;color:#D97706;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:600">⭐ VIP</span>' : ''}
+            </div>
+            ${c.notas ? `<div style="font-size:12px;color:var(--text-muted);margin-top:1px">${c.notas.slice(0, 45)}${c.notas.length > 45 ? '…' : ''}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      <td>${c.tel ? `<a href="https://wa.me/52${c.tel.replace(/\D/g,'')}" target="_blank" style="color:var(--success);font-weight:500">${c.tel}</a>` : '<span style="color:var(--text-light)">—</span>'}</td>
+      <td>${visitaBadge}</td>
+      <td>
+        <div style="font-size:13.5px;font-weight:600">${cc.length}</div>
+        ${freq ? `<div style="font-size:11px;color:var(--text-muted)">c/ ${freq}d</div>` : ''}
+      </td>
+      <td>
+        ${gasto > 0
+          ? `<div style="font-weight:600;font-size:13.5px">$${gasto.toLocaleString('es-MX')}</div>`
+          : '<span style="color:var(--text-light)">$0</span>'}
+      </td>
+      <td>${salonBadge}</td>
+      <td style="white-space:nowrap">
+        ${c.tel ? `<a href="https://wa.me/52${c.tel.replace(/\D/g,'')}" target="_blank" class="btn btn-success btn-sm">WA</a>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick='verHistorial("${c.id}")'>Historial</button>
+        <button class="btn btn-ghost btn-sm" onclick='editarCliente("${c.id}")'>Editar</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filtrar() {
+  const q       = document.getElementById('busqueda').value.toLowerCase();
+  const estado  = document.getElementById('filtroEstado').value;
+  const hoy     = new Date();
+
+  let lista = clientes.filter(c =>
+    c.nombre.toLowerCase().includes(q) || (c.tel || '').includes(q)
+  );
+
+  if (estado === 'vip')    lista = lista.filter(c => citasDe(c.id).length >= 5);
+  if (estado === 'riesgo') lista = lista.filter(c => { const d = diasDesdeUltima(citasDe(c.id)); return d !== null && d >= 60; });
+  if (estado === 'nuevas') lista = lista.filter(c => {
+    if (!c.creadoEn) return false;
+    const d = new Date(c.creadoEn);
+    return d.getMonth() === hoy.getMonth() && d.getFullYear() === hoy.getFullYear();
+  });
+
+  renderTabla(lista);
+}
+
+function abrirModal(data = {}) {
+  editId = data.id || null;
+  document.getElementById('tituloModal').textContent = editId ? 'Editar clienta' : 'Nueva clienta';
+  document.getElementById('cliNombre').value = data.nombre || '';
+  document.getElementById('cliTel').value = data.tel || '';
+  document.getElementById('cliEmail').value = data.email || '';
+  document.getElementById('cliSalon').value = data.salonFrecuente || '';
+  document.getElementById('cliNotas').value = data.notas || '';
+  document.getElementById('modalCliente').classList.add('open');
+}
+
+function editarCliente(id) {
+  const c = clientes.find(x => x.id === id);
+  if (c) abrirModal(c);
+}
+
+async function guardar() {
+  const nombre = document.getElementById('cliNombre').value.trim();
+  if (!nombre) { toast('Escribe el nombre', 'error'); return; }
+  const payload = {
+    id: editId,
+    nombre,
+    tel:             document.getElementById('cliTel').value.trim(),
+    email:           document.getElementById('cliEmail').value.trim(),
+    salonFrecuente:  document.getElementById('cliSalon').value,
+    notas:           document.getElementById('cliNotas').value.trim(),
+  };
+  const r = await fetch('/api/clientes', {
+    method: editId ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const d = await r.json();
+  if (d.ok) {
+    toast('Guardado', 'success');
+    cerrarModal('modalCliente');
+    await cargarClientes();
+    renderStats();
+    filtrar();
+  } else {
+    toast(d.error || 'Error', 'error');
+  }
+}
+
+async function verHistorial(id) {
+  const c   = clientes.find(x => x.id === id);
+  if (!c) return;
+  const cc  = citasDe(c.id);
+  const gasto = totalGastado(cc);
+  const dias  = diasDesdeUltima(cc);
+  const freq  = frecuenciaPromedio(cc);
+  const vip   = cc.length >= 5;
+  const pal   = avatarPalette(c.nombre);
+  const ini   = initiales(c.nombre);
+
+  // Header avatar
+  const avatarEl = document.getElementById('historialAvatar');
+  avatarEl.textContent = ini;
+  avatarEl.style.cssText = `width:40px;height:40px;font-size:15px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;background:${pal.bg};color:${pal.color};border:1px solid transparent`;
+
+  document.getElementById('historialTitulo').textContent = c.nombre + (vip ? '  ⭐' : '');
+  document.getElementById('historialSub').textContent = [
+    c.tel || '',
+    c.email || '',
+    c.salonFrecuente === 'vs' ? 'Vicente Suárez' : c.salonFrecuente === 'jb' ? 'Juan de la Barrera' : '',
+  ].filter(Boolean).join(' · ');
+
+  // Mini stats
+  const statStyle = 'padding:14px 18px;border-right:1px solid var(--border);text-align:center';
+  document.getElementById('historialStats').innerHTML = `
+    <div style="${statStyle}">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Visitas</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700">${cc.length}</div>
+    </div>
+    <div style="${statStyle}">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Total gastado</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;color:var(--accent)">$${gasto.toLocaleString('es-MX')}</div>
+    </div>
+    <div style="${statStyle}">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Frecuencia</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700">${freq ? `c/${freq}d` : '—'}</div>
+    </div>
+    <div style="padding:14px 18px;text-align:center">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Última visita</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;color:${dias == null ? 'var(--text-light)' : dias < 30 ? 'var(--success)' : dias < 60 ? 'var(--warning)' : 'var(--danger)'}">${dias != null ? `${dias}d` : '—'}</div>
+    </div>`;
+
+  // Citas list
+  const acciones = `
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      ${c.tel ? `<a href="https://wa.me/52${c.tel.replace(/\D/g,'')}" target="_blank" class="btn btn-success btn-sm">Abrir WhatsApp</a>` : ''}
+      <button class="btn btn-secondary btn-sm" onclick='editarCliente("${c.id}");cerrarModal("modalHistorial")'>Editar datos</button>
+      ${c.notas ? `<div style="background:var(--accent-light);padding:8px 14px;border-radius:8px;font-size:13px;color:var(--accent);flex:1">${c.notas}</div>` : ''}
+    </div>`;
+
+  const lista = cc.length === 0
+    ? '<div class="empty" style="padding:32px 0"><div class="empty-icon">📅</div><p>Sin citas registradas aún.</p></div>'
+    : `<div style="display:flex;flex-direction:column;gap:8px">
+        ${cc.map(cit => {
+          const svc  = servicios.find(s => s.id === cit.servicioId);
+          const tec  = tecnicos.find(t => t.id === cit.tecnicaId);
+          const cobrado = cit.totalCobrado != null ? Number(cit.totalCobrado) : (svc ? Number(svc.precio) : 0);
+          const estadoColor = cit.estado === 'completada' ? 'var(--success)' : cit.estado === 'cancelada' ? 'var(--danger)' : 'var(--warning)';
+          const estadoBg    = cit.estado === 'completada' ? 'var(--success-light)' : cit.estado === 'cancelada' ? 'var(--danger-light)' : 'var(--warning-light)';
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border:1px solid var(--border);border-radius:9px;font-size:13.5px">
+            <div>
+              <div style="font-weight:600">${cit.fecha} · ${cit.hora}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${svc?.nombre || '—'}${tec ? ' · ' + tec.nombre : ''}${cit.notas ? ' · ' + cit.notas.slice(0,30) : ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              ${cobrado > 0 ? `<strong style="color:var(--accent)">$${cobrado.toLocaleString('es-MX')}</strong>` : ''}
+              <span style="background:${estadoBg};color:${estadoColor};border-radius:10px;font-size:11px;padding:2px 8px;font-weight:600">${cit.estado}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+
+  document.getElementById('historialBody').innerHTML = acciones + lista;
+  document.getElementById('modalHistorial').classList.add('open');
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type = '') {
+  const div = document.createElement('div');
+  div.className = `toast ${type}`;
+  div.textContent = msg;
+  document.getElementById('toasts').appendChild(div);
+  setTimeout(() => div.remove(), 3000);
+}
+
+document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', e => { if (e.target === b) b.classList.remove('open'); }));
+
+init();
+</script>
+</body>
+</html>
