@@ -1,4 +1,5 @@
 import redis, { keys, newId } from '../lib/redis.js';
+import parseBody from '../lib/parseBody.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -17,8 +18,9 @@ export default async function handler(req, res) {
     const body = await parseBody(req);
 
     if (req.method === 'POST') {
-      const { fecha, hora, tecnicaId, clienteId, clienteNombre, clienteTel, servicioId } = body;
-      if (!fecha || !hora || !tecnicaId || !clienteId) return res.status(400).json({ ok: false, error: 'Campos requeridos faltantes' });
+      const { fecha, hora, clienteId, clienteNombre, clienteTel, servicioId } = body;
+      const tecnicaId = body.tecnicaId || 'cualquiera';
+      if (!fecha || !hora || !clienteId) return res.status(400).json({ ok: false, error: 'Campos requeridos faltantes' });
       const id = newId();
       const item = { id, fecha, hora, tecnicaId, clienteId, clienteNombre, clienteTel, servicioId, creadoEn: new Date().toISOString() };
       await redis.set(keys.waitlistItem(id), item);
@@ -27,7 +29,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
-      const { id, fecha, hora, tecnicaId } = body;
+      const { id, fecha, hora } = body;
+      const tecnicaId = body.tecnicaId || 'cualquiera';
       await redis.del(keys.waitlistItem(id));
       await redis.srem(keys.waitlist(fecha, hora, tecnicaId), id);
       return res.json({ ok: true });
@@ -40,11 +43,3 @@ export default async function handler(req, res) {
   }
 }
 
-async function parseBody(req) {
-  if (req._body) return req.body;
-  return new Promise((resolve) => {
-    let data = '';
-    req.on('data', c => data += c);
-    req.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve({}); } });
-  });
-}

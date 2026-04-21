@@ -1,24 +1,20 @@
 import redis, { keys, newId } from '../lib/redis.js';
+import { enviarWhatsApp } from '../lib/twilio.js';
+import parseBody from '../lib/parseBody.js';
 
 async function notificarWaitlist(cita) {
   try {
-    const ids = await redis.smembers(keys.waitlist(cita.fecha, cita.hora, cita.tecnicaId));
+    const tecnicaId = cita.tecnicaId || 'cualquiera';
+    const ids = await redis.smembers(keys.waitlist(cita.fecha, cita.hora, tecnicaId));
     if (!ids.length) return;
     const items = await Promise.all(ids.map(id => redis.get(keys.waitlistItem(id))));
-    const sorted = items.filter(Boolean).sort((a, b) => a.creadoEn.localeCompare(b.creadoEn));
-    const primero = sorted[0];
+    const primero = items.filter(Boolean).sort((a, b) => a.creadoEn.localeCompare(b.creadoEn))[0];
     if (!primero?.clienteTel) return;
-    const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER } = process.env;
-    if (!TWILIO_ACCOUNT_SID) return;
-    const hora12 = (() => {
-      const [h, m] = cita.hora.split(':');
-      const hr = parseInt(h);
-      return `${hr > 12 ? hr - 12 : hr}:${m} ${hr >= 12 ? 'pm' : 'am'}`;
-    })();
+    const [h, m] = cita.hora.split(':');
+    const hr = parseInt(h);
+    const hora12 = `${hr > 12 ? hr - 12 : hr}:${m} ${hr >= 12 ? 'pm' : 'am'}`;
     const msg = `Hola ${primero.clienteNombre?.split(' ')[0] || ''}! 💅 Se liberó un lugar para el ${cita.fecha} a las ${hora12}. ¿Quieres tu cita? Responde SÍ para apartar tu lugar. — N de Nails`;
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const body = new URLSearchParams({ From: TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886', To: `whatsapp:${primero.clienteTel}`, Body: msg });
-    await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64') }, body });
+    await enviarWhatsApp(primero.clienteTel, msg);
   } catch (e) {
     console.error('Error notificando waitlist:', e);
   }
@@ -110,11 +106,3 @@ export default async function handler(req, res) {
   }
 }
 
-async function parseBody(req) {
-  if (req._body) return req.body;
-  return new Promise((resolve) => {
-    let data = '';
-    req.on('data', c => data += c);
-    req.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve({}); } });
-  });
-}

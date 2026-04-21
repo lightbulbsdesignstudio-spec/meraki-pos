@@ -1,4 +1,5 @@
 import redis, { keys, newId } from '../lib/redis.js';
+import parseBody from '../lib/parseBody.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -76,11 +77,3 @@ export default async function handler(req, res) {
   }
 }
 
-async function parseBody(req) {
-  if (req._body) return req.body;
-  return new Promise((resolve) => {
-    let data = '';
-    req.on('data', c => data += c);
-    req.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve({}); } });
-  });
-}

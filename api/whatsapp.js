@@ -1,19 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk';
 import redis, { keys, newId } from '../lib/redis.js';
+import { enviarWhatsApp, twilioAuth } from '../lib/twilio.js';
+import parseBody from '../lib/parseBody.js';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// ─── Función para enviar mensaje por WhatsApp via Twilio ─────────────────────
-async function enviarWhatsApp(to, mensaje) {
-  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER } = process.env;
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) return { ok: false, error: 'Twilio no configurado' };
-
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-  const body = new URLSearchParams({ From: TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886', To: `whatsapp:${to}`, Body: mensaje });
-  const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64') }, body });
-  const data = await resp.json();
-  return resp.ok ? { ok: true } : { ok: false, error: data.message };
-}
+const WA_ITEM_TTL = 86400 * 30; // 30 días
 
 // ─── Clasificar mensaje con Claude ──────────────────────────────────────────
 async function clasificarMensaje(texto, tieneImagen, servicios, historial, contexto) {
@@ -83,8 +75,7 @@ Solo diseño: { "categoria": "diseno" }`;
   });
 
   try {
-    const raw = response.content[0].text.trim();
-    return JSON.parse(raw);
+    return JSON.parse(response.content[0].text.trim());
   } catch {
     return { categoria: 'otro', respuesta: 'Hola! Gracias por escribirnos. ¿En qué te podemos ayudar? 💅' };
   }
@@ -93,13 +84,14 @@ Solo diseño: { "categoria": "diseno" }`;
 // ─── Analizar imagen de diseño con Claude Vision ─────────────────────────────
 async function analizarDiseno(mediaUrl, servicios) {
   try {
-    // Descargar la imagen como base64
-    const imgResp = await fetch(mediaUrl);
+    const auth = twilioAuth();
+    const imgResp = await fetch(mediaUrl, auth ? { headers: { Authorization: auth } } : {});
+    if (!imgResp.ok) throw new Error(`Imagen no descargable: ${imgResp.status}`);
+
     const buffer = await imgResp.arrayBuffer();
     const base64 = Buffer.from(buffer).toString('base64');
     const contentType = imgResp.headers.get('content-type') || 'image/jpeg';
 
-    // Calcular rango de precios según servicios disponibles
     const precioBase = servicios.reduce((s, x) => s + Number(x.precio), 0) / (servicios.length || 1);
 
     const response = await anthropic.messages.create({
@@ -108,10 +100,7 @@ async function analizarDiseno(mediaUrl, servicios) {
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: contentType, data: base64 }
-          },
+          { type: 'image', source: { type: 'base64', media_type: contentType, data: base64 } },
           {
             type: 'text',
             text: `Analiza este diseño de uñas para cotizarlo. Responde SOLO en JSON:
@@ -137,8 +126,7 @@ Para complejidad muy alta: precio base x2.0 a 3.0`
       }]
     });
 
-    const raw = response.content[0].text.trim();
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(response.content[0].text.trim());
     return {
       ok: true,
       descripcion: parsed.descripcion,
@@ -159,7 +147,6 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
 
   try {
-    // ── GET: listar conversaciones / cola ─────────────────────────────────
     if (req.method === 'GET') {
       const { tipo } = req.query;
       if (tipo === 'queue') {
@@ -174,28 +161,24 @@ export default async function handler(req, res) {
 
     const body = await parseBody(req);
 
-    // ── POST: webhook Twilio ─────────────────────────────────────────────
     if (req.method === 'POST' && !body.accion) {
       return handleTwilioWebhook(req, res, body);
     }
 
-    // ── POST: acciones internas (cotizar, responder, leer) ────────────────
     if (req.method === 'POST' && body.accion) {
       const item = await redis.get(keys.waItem(body.id));
       if (!item) return res.status(404).json({ ok: false, error: 'Conversación no encontrada' });
 
       if (body.accion === 'cotizar') {
         const msgCotiz = body.mensaje || `Tu diseño queda en $${body.precio}. ¿Te agendamos? 💅`;
-        // Enviar por WhatsApp
         await enviarWhatsApp(item.phone, msgCotiz);
-        // Agregar mensaje al historial
         const updated = {
           ...item,
           estado: 'respondido',
           mensajes: [...(item.mensajes || []), { tipo: 'out', texto: msgCotiz, timestamp: Date.now() }],
           precioCotizado: body.precio,
         };
-        await redis.set(keys.waItem(body.id), updated);
+        await redis.set(keys.waItem(body.id), updated, { ex: WA_ITEM_TTL });
         return res.json({ ok: true });
       }
 
@@ -206,21 +189,25 @@ export default async function handler(req, res) {
           ultimoMensaje: body.mensaje,
           mensajes: [...(item.mensajes || []), { tipo: 'out', texto: body.mensaje, timestamp: Date.now() }],
         };
-        await redis.set(keys.waItem(body.id), updated);
+        await redis.set(keys.waItem(body.id), updated, { ex: WA_ITEM_TTL });
         return res.json({ ok: true });
       }
 
       if (body.accion === 'leer') {
-        await redis.set(keys.waItem(body.id), { ...item, leido: true });
+        await redis.set(keys.waItem(body.id), { ...item, leido: true }, { ex: WA_ITEM_TTL });
         return res.json({ ok: true });
       }
     }
 
-    // ── PUT: actualizar item ──────────────────────────────────────────────
+    // PUT: solo campos seguros permitidos
     if (req.method === 'PUT') {
       const item = await redis.get(keys.waItem(body.id));
       if (!item) return res.status(404).json({ ok: false, error: 'No encontrado' });
-      await redis.set(keys.waItem(body.id), { ...item, ...body });
+      const CAMPOS_PERMITIDOS = ['leido', 'estado', 'nombre', 'notas'];
+      const patch = Object.fromEntries(
+        Object.entries(body).filter(([k]) => CAMPOS_PERMITIDOS.includes(k))
+      );
+      await redis.set(keys.waItem(body.id), { ...item, ...patch }, { ex: WA_ITEM_TTL });
       return res.json({ ok: true });
     }
 
@@ -231,19 +218,15 @@ export default async function handler(req, res) {
   }
 }
 
-// ─── Manejar webhook entrante de Twilio ──────────────────────────────────────
+// ─── Webhook Twilio ──────────────────────────────────────────────────────────
 async function handleTwilioWebhook(req, res, body) {
-  // Twilio envía form-encoded; si viene como string, parsear
   let data = body;
-  if (typeof body === 'string') {
-    data = Object.fromEntries(new URLSearchParams(body));
-  }
+  if (typeof body === 'string') data = Object.fromEntries(new URLSearchParams(body));
 
   const phone = (data.From || '').replace('whatsapp:', '');
   const texto = data.Body || '';
   const nombre = data.ProfileName || phone;
 
-  // Recolectar todas las imágenes que Twilio envía (MediaUrl0, MediaUrl1, ...)
   const mediaUrls = [];
   for (let i = 0; data[`MediaUrl${i}`]; i++) mediaUrls.push(data[`MediaUrl${i}`]);
   const mediaUrl = mediaUrls[0] || null;
@@ -251,15 +234,12 @@ async function handleTwilioWebhook(req, res, body) {
 
   if (!phone) return res.status(400).json({ ok: false, error: 'Sin número' });
 
-  // Cargar o crear sesión
   const sessionKey = keys.waSession(phone);
   const session = (await redis.get(sessionKey)) || { phone, nombre, mensajes: [] };
 
-  // Agregar mensaje entrante al historial
   const msgEntrada = { tipo: 'in', texto, mediaUrl, timestamp: Date.now() };
   session.mensajes = [...(session.mensajes || []).slice(-20), msgEntrada];
 
-  // Cargar catálogos para contexto de la IA
   const [svcIds, tecnicaIds] = await Promise.all([
     redis.smembers(keys.servicios()),
     redis.smembers(keys.tecnicas()),
@@ -271,53 +251,40 @@ async function handleTwilioWebhook(req, res, body) {
   const servicios = svcItems.filter(Boolean);
   const tecnicas = tecnicaItems.filter(t => t && t.activa !== false);
 
-  // Disponibilidad del día actual
   const fechaHoy = new Date().toISOString().split('T')[0];
   const citasHoyIds = await redis.smembers(keys.citasFecha(fechaHoy));
   const citasHoyItems = citasHoyIds.length ? await Promise.all(citasHoyIds.map(id => redis.get(keys.cita(id)))) : [];
   const citasHoy = citasHoyItems.filter(c => c && c.estado !== 'cancelada');
 
-  // Clasificar con Claude (con contexto de disponibilidad)
   const clasificacion = await clasificarMensaje(texto, tieneImagen, servicios, session.mensajes, { tecnicas, citasHoy, fechaHoy });
 
   if (clasificacion.categoria === 'diseno') {
-    // ── FLUJO DISEÑO: enqueue para Cha ──────────────────────────────────
     let analisis = { ok: false, descripcion: 'Diseño recibido', precioMin: 300, precioMax: 600 };
-    if (mediaUrl) {
-      analisis = await analizarDiseno(mediaUrl, servicios);
-    }
+    if (mediaUrl) analisis = await analizarDiseno(mediaUrl, servicios);
 
     const itemId = newId();
     const item = {
-      id: itemId,
-      phone,
-      nombre,
-      tipo: 'diseno',
-      estado: 'pendiente',
-      leido: false,
+      id: itemId, phone, nombre,
+      tipo: 'diseno', estado: 'pendiente', leido: false,
       timestamp: Date.now(),
       ultimoMensaje: `📸 ${mediaUrls.length > 1 ? mediaUrls.length + ' diseños' : 'Diseño especial'}`,
       mensajes: [msgEntrada],
       analisisIA: `${analisis.descripcion} · Complejidad: ${analisis.complejidad}${analisis.notas ? ' · ' + analisis.notas : ''}`,
       precioSugerido: `$${analisis.precioMin}–$${analisis.precioMax}`,
-      mediaUrl,
-      mediaUrls,
+      mediaUrl, mediaUrls,
     };
-    await redis.set(keys.waItem(itemId), item);
+    await redis.set(keys.waItem(itemId), item, { ex: WA_ITEM_TTL });
     await redis.sadd(keys.waQueue(), itemId);
 
-    // Confirmar recepción a la clienta
     const confirmacion = 'Hola! Recibimos tu diseño 💅 Lo revisamos y en unos minutos te enviamos el precio. ¡Gracias por elegirnos!';
     await enviarWhatsApp(phone, confirmacion);
     session.mensajes.push({ tipo: 'bot', texto: confirmacion, timestamp: Date.now() });
 
   } else {
-    // ── FLUJO AUTOMÁTICO: responder con IA ──────────────────────────────
     const respuesta = clasificacion.respuesta || 'Gracias por contactarnos. En breve te atendemos. 💅';
     await enviarWhatsApp(phone, respuesta);
     session.mensajes.push({ tipo: 'bot', texto: respuesta, timestamp: Date.now() });
 
-    // Actualizar o crear item en cola
     const existingIds = await redis.smembers(keys.waQueue());
     let existingId = null;
     for (const id of existingIds) {
@@ -329,43 +296,24 @@ async function handleTwilioWebhook(req, res, body) {
       const existing = await redis.get(keys.waItem(existingId));
       await redis.set(keys.waItem(existingId), {
         ...existing,
-        ultimoMensaje: texto,
-        leido: false,
-        timestamp: Date.now(),
+        ultimoMensaje: texto, leido: false, timestamp: Date.now(),
         mensajes: [...(existing.mensajes || []).slice(-30), msgEntrada, { tipo: 'bot', texto: respuesta, timestamp: Date.now() }],
-      });
+      }, { ex: WA_ITEM_TTL });
     } else {
       const itemId = newId();
       await redis.set(keys.waItem(itemId), {
         id: itemId, phone, nombre,
         tipo: clasificacion.categoria || 'otro',
-        estado: 'activo', leido: false,
-        timestamp: Date.now(), ultimoMensaje: texto,
+        estado: 'activo', leido: false, timestamp: Date.now(),
+        ultimoMensaje: texto,
         mensajes: [msgEntrada, { tipo: 'bot', texto: respuesta, timestamp: Date.now() }],
-      });
+      }, { ex: WA_ITEM_TTL });
       await redis.sadd(keys.waQueue(), itemId);
     }
   }
 
-  // Guardar sesión actualizada
-  await redis.set(sessionKey, session, { ex: 86400 * 7 }); // 7 días
+  await redis.set(sessionKey, session, { ex: 86400 * 7 });
 
-  // Twilio espera XML o 200 vacío
   res.setHeader('Content-Type', 'text/xml');
   res.status(200).send('<?xml version="1.0" encoding="UTF-8"?><Response></Response>');
-}
-
-async function parseBody(req) {
-  if (req._body) return req.body;
-  return new Promise((resolve) => {
-    let data = '';
-    req.on('data', c => data += c);
-    req.on('end', () => {
-      try { resolve(JSON.parse(data)); }
-      catch {
-        try { resolve(Object.fromEntries(new URLSearchParams(data))); }
-        catch { resolve({}); }
-      }
-    });
-  });
 }

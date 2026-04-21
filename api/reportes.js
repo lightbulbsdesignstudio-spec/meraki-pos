@@ -1,4 +1,5 @@
 import redis, { keys } from '../lib/redis.js';
+import parseBody from '../lib/parseBody.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -120,7 +121,8 @@ function getPeriodo(periodo) {
   const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
   if (periodo === 'semana') {
-    const lunes = new Date(hoy); lunes.setDate(hoy.getDate() - hoy.getDay() + 1);
+    const diasDesdeL = hoy.getDay() === 0 ? 6 : hoy.getDay() - 1;
+    const lunes = new Date(hoy); lunes.setDate(hoy.getDate() - diasDesdeL);
     const domingo = new Date(lunes); domingo.setDate(lunes.getDate() + 6);
     return { desde: fmt(lunes), hasta: fmt(domingo), label: 'Esta semana' };
   }
