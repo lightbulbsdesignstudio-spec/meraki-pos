@@ -29,6 +29,7 @@
 
 <div class="main">
   <div class="topbar">
+    <button id="sidebarToggle" onclick="toggleSidebar()" style="display:none;flex-shrink:0;align-items:center;justify-content:center;background:none;border:1px solid rgba(0,0,0,.12);border-radius:8px;padding:6px 9px;cursor:pointer;color:var(--text)" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <h1>Configuración</h1>
   </div>
   <div class="page">
@@ -266,6 +267,38 @@ document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('cl
 
 init();
 </script>
-<script src="/assets/mobile.js"></script>
+<script>
+(function(){
+  var W=window.innerWidth||document.documentElement.clientWidth||0;
+  if(W>900)return;
+  var nav=document.querySelector('nav.nav');
+  var main=document.querySelector('.main');
+  var btn=document.getElementById('sidebarToggle');
+  if(nav)nav.style.display='none';
+  if(main){main.style.marginLeft='0';main.style.paddingBottom='72px';}
+  if(btn)btn.style.display='flex';
+  var p=location.pathname;
+  var cur=p.includes('clientes')?'clientes':p.includes('whatsapp')?'whatsapp':p.includes('reportes')?'reportes':p.includes('config')?'config':'agenda';
+  var items=[
+    ['agenda','/index.html','Agenda','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'],
+    ['clientes','/clientes.html','Clientes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'],
+    ['whatsapp','/whatsapp.html','WhatsApp','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'],
+    ['reportes','/reportes.html','Reportes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'],
+    ['config','/config.html','Config','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>'],
+  ];
+  var bar=document.createElement('div');
+  bar.style.cssText='display:flex;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:9999;border-top:1px solid rgba(255,255,255,.12)';
+  bar.innerHTML=items.map(function(i){
+    var a=i[0]===cur;
+    return '<a href="'+i[1]+'" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 2px 6px;color:'+(a?'#fff':'rgba(255,255,255,.38)')+';text-decoration:none;font-family:system-ui,sans-serif;font-size:9px;font-weight:'+(a?'600':'400')+'"><div style="width:20px;height:20px">'+i[3]+'</div>'+i[2]+'</a>';
+  }).join('');
+  document.body.appendChild(bar);
+})();
+window.toggleSidebar=function(){
+  var n=document.querySelector('nav.nav');
+  if(!n)return;
+  n.style.display=(n.style.display==='none')?'flex':'none';
+};
+</script>
 </body>
 </html>
