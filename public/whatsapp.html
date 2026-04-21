@@ -382,14 +382,14 @@ async function mostrarBookingWidget() {
 }
 
 function abrirDetalleMovil() {
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= 768 && document.getElementById('waDetail')) {
     document.getElementById('waDetail').classList.add('activo');
-    document.querySelector('.wa-back-btn').style.display = 'flex';
   }
 }
 function cerrarDetalleMovil() {
-  document.getElementById('waDetail').classList.remove('activo');
-  document.querySelector('.wa-back-btn').style.display = 'none';
+  if (document.getElementById('waDetail')) {
+    document.getElementById('waDetail').classList.remove('activo');
+  }
 }
 
 function cerrarBookingWidget() {

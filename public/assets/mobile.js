@@ -1,37 +1,52 @@
 (function () {
-  // Inject overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'nav-overlay';
-  document.body.appendChild(overlay);
+  if (window.innerWidth > 768) return;
 
-  // Inject hamburger into topbar (before first child)
-  const topbar = document.querySelector('.topbar');
-  if (topbar) {
-    const btn = document.createElement('button');
-    btn.className = 'hamburger';
-    btn.setAttribute('aria-label', 'Menú');
-    btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
-    topbar.insertBefore(btn, topbar.firstChild);
-    btn.addEventListener('click', openNav);
+  const path = location.pathname;
+  const current = path.includes('clientes') ? 'clientes'
+    : path.includes('whatsapp') ? 'whatsapp'
+    : path.includes('reportes') ? 'reportes'
+    : path.includes('config') ? 'config'
+    : 'agenda';
+
+  const ITEMS = [
+    {
+      id: 'agenda', href: '/index.html', label: 'Agenda',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+    },
+    {
+      id: 'clientes', href: '/clientes.html', label: 'Clientes',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+    },
+    {
+      id: 'whatsapp', href: '/whatsapp.html', label: 'WhatsApp',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+    },
+    {
+      id: 'reportes', href: '/reportes.html', label: 'Reportes',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'
+    },
+    {
+      id: 'config', href: '/config.html', label: 'Config',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>'
+    },
+  ];
+
+  const bar = document.createElement('nav');
+  bar.className = 'nav-bottom';
+  bar.innerHTML = ITEMS.map(item =>
+    `<a href="${item.href}" class="nav-bottom-item${item.id === current ? ' active' : ''}">${item.icon}<span>${item.label}</span></a>`
+  ).join('');
+  document.body.appendChild(bar);
+
+  // WA detail back button
+  function abrirDetalleMovil() {
+    const d = document.getElementById('waDetail');
+    if (d) d.classList.add('activo');
   }
-
-  overlay.addEventListener('click', closeNav);
-
-  // Close nav when a link is tapped
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.addEventListener('click', closeNav);
-  });
-
-  function openNav() { document.body.classList.add('nav-open'); }
-  function closeNav() { document.body.classList.remove('nav-open'); }
-
-  // WA detail back button on mobile
-  document.addEventListener('wa:openDetalle', function () {
-    const detalle = document.querySelector('.wa-panel-detalle');
-    if (detalle && window.innerWidth <= 768) detalle.classList.add('activo');
-  });
-  document.addEventListener('wa:closeDetalle', function () {
-    const detalle = document.querySelector('.wa-panel-detalle');
-    if (detalle) detalle.classList.remove('activo');
-  });
+  function cerrarDetalleMovil() {
+    const d = document.getElementById('waDetail');
+    if (d) d.classList.remove('activo');
+  }
+  window.abrirDetalleMovil = abrirDetalleMovil;
+  window.cerrarDetalleMovil = cerrarDetalleMovil;
 })();
