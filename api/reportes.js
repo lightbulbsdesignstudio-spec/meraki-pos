@@ -57,7 +57,12 @@ export default async function handler(req, res) {
 
     // Servicios top
     const svcCount = {};
-    completadas.forEach(c => { svcCount[c.servicioId] = (svcCount[c.servicioId] || 0) + 1; });
+    completadas.forEach(c => {
+      const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+      citaServicios.forEach(s => {
+        svcCount[s.id] = (svcCount[s.id] || 0) + 1;
+      });
+    });
     const serviciosData = Object.entries(svcCount)
       .map(([id, count]) => { const s = servicios.find(x => x.id === id); return s ? { nombre: s.nombre, count, precio: s.precio } : null; })
       .filter(Boolean).sort((a, b) => b.count - a.count).slice(0, 8);
@@ -72,7 +77,8 @@ export default async function handler(req, res) {
       const cli = clientes.find(x => x.id === id);
       const gasto = cits.reduce((s, c) => s + getIngreso(c), 0);
       const ultima = cits.sort((a, b) => b.fecha.localeCompare(a.fecha))[0];
-      const ultimoSvc = servicios.find(s => s.id === ultima?.servicioId);
+      const ultimaServicios = ultima?.servicios || (ultima?.servicioId ? [{id: ultima.servicioId}] : []);
+      const ultimoSvc = ultimaServicios.length > 0 ? servicios.find(s => s.id === ultimaServicios[0].id) : null;
       return { nombre: cli?.nombre || 'Desconocido', visitas: cits.length, gasto, ultimoServicio: ultimoSvc?.nombre || '—' };
     }).sort((a, b) => b.visitas - a.visitas).slice(0, 10);
 

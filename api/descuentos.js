@@ -45,6 +45,7 @@ export default async function handler(req, res) {
         citaId: body.citaId,
         clienteId: body.clienteId || '',
         servicioId: body.servicioId || '',
+        servicios: body.servicios || [],
         tecnicaId: body.tecnicaId || '',
         montoOriginal: Number(body.montoOriginal) || 0,
         monto: Number(body.monto) || 0, // monto del descuento aplicado

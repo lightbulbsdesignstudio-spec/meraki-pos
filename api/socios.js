@@ -27,8 +27,12 @@ export default async function handler(req, res) {
 
       const getIngreso = (c) => {
         if (c.totalCobrado != null) return Number(c.totalCobrado);
-        const svc = servicios.find(s => s.id === c.servicioId);
-        return svc ? Number(svc.precio) : 0;
+        const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+        const monto = citaServicios.reduce((sum, s) => {
+          const svc = servicios.find(x => x.id === s.id);
+          return sum + (svc ? Number(svc.precio) : 0);
+        }, 0);
+        return monto;
       };
 
       const ingresoTotal = completadas.reduce((s, c) => s + getIngreso(c), 0);
