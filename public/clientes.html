@@ -152,14 +152,14 @@ async function init() {
 }
 
 async function cargarClientes() {
-  try { const r = await fetch('/api/clientes'); const d = await r.json(); clientes = d.data || []; } catch {}
+  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; } catch {}
 }
 async function cargarCitas() {
-  try { const r = await fetch('/api/citas?all=1'); const d = await r.json(); citas = d.data || []; } catch {}
+  try { const r = await fetch('/api/citas?all=1', { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; } catch {}
 }
 async function cargarConfig() {
   try {
-    const [rt, rs] = await Promise.all([fetch('/api/config?tipo=tecnicas'), fetch('/api/config?tipo=servicios')]);
+    const [rt, rs] = await Promise.all([fetch('/api/config?tipo=tecnicas', { credentials:'same-origin' }), fetch('/api/config?tipo=servicios', { credentials:'same-origin' })]);
     tecnicos = (await rt.json()).data || [];
     servicios = (await rs.json()).data || [];
   } catch {}

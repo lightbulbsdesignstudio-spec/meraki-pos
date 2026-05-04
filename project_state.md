@@ -3,18 +3,33 @@
 
 ---
 
-## [CRÍTICO — 2026-05-04 10:15 CDT]
-**Origen:** Bug de guardado de clientes reportado por Brenda — "no deja guardar el nombre"
-**Raíz:** 5 fetch() POST/PUT/DELETE sin `credentials: 'same-origin'`. Las cookies HTTP-Only no viajaban, `requireAuth()` rechazaba.
-**Ubicaciones arregladas:**
-- clientes.html:356 — guardar() clienta ← BUG PRINCIPAL
-- index.html:549 — guardarCita()
-- index.html:612 — cambiarEstadoCita()
-- config.html:362 — toggleTecnica()
-- socios.html:260 — guardar() socios
+## [CRÍTICO — 2026-05-04 10:15 CDT — AMPLIADO 15:25 CDT]
+**Origen:** Bug sistemático de credenciales HTTP-Only en fetch()
+**Síntoma 1 (Reporte Brenda, 10:15):** "No deja guardar el nombre" en registro de clienta
+- **Raíz:** 5 fetch() POST/PUT/DELETE sin `credentials: 'same-origin'`
+- **Status:** ✅ Arreglado commit 337be11
+- **Ubicaciones fix #1:**
+  - clientes.html:356 — guardar() clienta ← BUG PRINCIPAL
+  - index.html:549 — guardarCita()
+  - index.html:612 — cambiarEstadoCita()
+  - config.html:362 — toggleTecnica()
+  - socios.html:260 — guardar() socios
 
-**Status:** ✅ Arreglado en commit 337be11
-**Acción requerida:** Brenda valida en https://meraki-pos.vercel.app (5 flujos clave: registrar clienta, agendar cita, cambiar estado, activar Nail Tech, guardar socios)
+**Síntoma 2 (Reporte Brenda, ~15:20):** "Registrada como usuaria pero NO deja guardar citas"
+- **Raíz:** GET requests en cargarCitas(), cargarTecnicas(), cargarServicios(), cargarClientes() sin credenciales
+- **Impacto:** RequireAuth rechaza incluso GETs sin sesión válida → datos no cargan → formulario vacío → guardarCita() silenciosamente falla
+- **Status:** ✅ Arreglado commit c7efcbe (hotfix 2)
+- **Ubicaciones fix #2:**
+  - index.html:403 — cargarTecnicas() GET /api/config?tipo=tecnicas
+  - index.html:406 — cargarServicios() GET /api/config?tipo=servicios
+  - index.html:409 — cargarClientes() GET /api/clientes
+  - index.html:413 — cargarCitas() GET /api/citas?fecha=X ← CRÍTICA
+  - index.html:905 — cargarWaitlistBody() GET /api/waitlist
+  - index.html:937 — agregarWaitlist() POST /api/waitlist
+  - index.html:946 — quitarWaitlist() DELETE /api/waitlist
+
+**Patrón raíz:** Falta sistemática de `credentials: 'same-origin'` en TODOS los fetch(). Problema global, no localizado.
+**Acción requerida:** Brenda re-valida en https://meraki-pos.vercel.app (tras redeploy de c7efcbe): agendar cita debe cargar datos y permitir guardado
 
 ---
 

@@ -125,7 +125,7 @@ let datos = null;
 
 async function cargar() {
   try {
-    const r = await fetch('/api/socios');
+    const r = await fetch('/api/socios', { credentials:'same-origin' });
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
     datos = d.data;
