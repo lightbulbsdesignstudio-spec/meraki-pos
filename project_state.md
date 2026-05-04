@@ -1,13 +1,20 @@
 # Project State — Meraki Nails POS
-> Última actualización: 2026-05-04 (bugfix crítico post-feedback Brenda)
+> Última actualización: 2026-05-04 (bugfix crítico sistemático — credenciales en fetch)
 
 ---
 
-## [CRÍTICO — 2026-05-04]
-**Origen:** Sesión debugging post-feedback Brenda sobre 3 funcionalidades "congeladas"
-**Cambio:** Arreglé bug crítico en config.html línea 355 — faltaba `credentials: 'same-origin'` en fetch de guardarTecnica(). Las actualizaciones de Nail Techs (nombre, comisión) no viajaban con sesión, servidor rechazaba por auth.
-**Status:** ✅ Arreglado + validación E2E pendiente con Brenda
-**Acción requerida:** Brenda prueba 3 flujos en vivo (editar Nail Tech, servicio, usuario) antes de declarar 100% operacional
+## [CRÍTICO — 2026-05-04 10:15 CDT]
+**Origen:** Bug de guardado de clientes reportado por Brenda — "no deja guardar el nombre"
+**Raíz:** 5 fetch() POST/PUT/DELETE sin `credentials: 'same-origin'`. Las cookies HTTP-Only no viajaban, `requireAuth()` rechazaba.
+**Ubicaciones arregladas:**
+- clientes.html:356 — guardar() clienta ← BUG PRINCIPAL
+- index.html:549 — guardarCita()
+- index.html:612 — cambiarEstadoCita()
+- config.html:362 — toggleTecnica()
+- socios.html:260 — guardar() socios
+
+**Status:** ✅ Arreglado en commit 337be11
+**Acción requerida:** Brenda valida en https://meraki-pos.vercel.app (5 flujos clave: registrar clienta, agendar cita, cambiar estado, activar Nail Tech, guardar socios)
 
 ---
 
@@ -85,6 +92,7 @@ UPSTASH_REDIS_REST_TOKEN=gQAAAAAAAakSAAIgcDE0ZjJiNzU2ODYxZDA0YTJmOWFhNjUzZjc2MWM
 6. Recordatorio cumpleaños
 
 ### Calidad de código
+- ~~Credenciales en fetch POST/PUT/DELETE~~ ✅ ARREGLADO 2026-05-04
 - XSS via `JSON.stringify` en `onclick` (servicios.html, clientes.html, config.html) — usar `data-id` + `addEventListener`
 - Race condition `setnx` en POST tipo='tecnica' y POST users
 - Doble `parseBody` en `api/config.js`
