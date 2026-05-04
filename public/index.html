@@ -100,8 +100,13 @@
         <select id="citaTecnica" onchange="cargarServiciosDeTecnica()"></select>
       </div>
       <div class="form-group">
-        <label>Servicio</label>
-        <select id="citaServicio"></select>
+        <label>Servicios</label>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <select id="citaServicio" style="flex:1"></select>
+          <button class="btn btn-primary btn-sm" type="button" onclick="agregarServicioACita()" style="flex-shrink:0">+ Agregar</button>
+        </div>
+        <div id="citaServiciosAgregados" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:8px">Total: <span id="citaPrecioTotal" style="font-weight:600;color:var(--accent)">$0</span></div>
       </div>
       <div class="form-group">
         <label>Estado</label>
@@ -362,7 +367,7 @@ let fechaActual = new Date();
 let filtroSalon = 'all';
 let vistaActual = 'dia';
 let tecnicos = [], servicios = [], clientes = [], citas = [];
-let citaEditando = null, citaSeleccionada = null;
+let citaEditando = null, citaSeleccionada = null, citaServiciosAgregados = [];
 let cobroMetodo = 'spei', cobroExtras = [];
 let cobroDescuento = null; // { monto, razon, autorizadoPor, via }
 let wlSlot = null; // { fecha, hora, tecnicaId, tecnicaNombre }
@@ -516,6 +521,7 @@ function renderCalendario() {
 // ─── CRUD Citas ──────────────────────────────────────────────────────────────
 function abrirModalCita(data = {}) {
   citaEditando = data.id || null;
+  citaServiciosAgregados = data.servicios || (data.servicioId ? [{id: data.servicioId}] : []);
   document.getElementById('modalCitaTitulo').textContent = citaEditando ? 'Editar cita' : 'Nueva cita';
   document.getElementById('citaFecha').value = data.fecha || formatDate(fechaActual);
   document.getElementById('citaHora').value = data.hora || '10:00';
@@ -524,16 +530,43 @@ function abrirModalCita(data = {}) {
   document.getElementById('citaEstado').value = data.estado || 'pendiente';
   document.getElementById('citaNotas').value = data.notas || '';
   cargarServiciosDeTecnica();
-  setTimeout(() => { document.getElementById('citaServicio').value = data.servicioId || ''; }, 50);
+  actualizarServiciosAgregados();
   document.getElementById('modalCita').classList.add('open');
 }
 function nuevaCitaEn(fecha, hora, tecnicaId) { abrirModalCita({ fecha, hora, tecnicaId }); }
+
+function agregarServicioACita() {
+  const id = document.getElementById('citaServicio').value;
+  if (!id) { toast('Selecciona un servicio', 'error'); return; }
+  if (citaServiciosAgregados.find(s => s.id === id)) { toast('Este servicio ya está agregado', 'warning'); return; }
+  const svc = servicios.find(s => s.id === id);
+  if (svc) citaServiciosAgregados.push({id, nombre: svc.nombre, precio: svc.precio});
+  actualizarServiciosAgregados();
+  document.getElementById('citaServicio').value = '';
+}
+
+function quitarServicioDeCita(servicioId) {
+  citaServiciosAgregados = citaServiciosAgregados.filter(s => s.id !== servicioId);
+  actualizarServiciosAgregados();
+}
+
+function actualizarServiciosAgregados() {
+  const container = document.getElementById('citaServiciosAgregados');
+  const precioTotal = citaServiciosAgregados.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+  document.getElementById('citaPrecioTotal').textContent = '$' + precioTotal.toLocaleString('es-MX');
+  container.innerHTML = citaServiciosAgregados.map(s => `
+    <div style="background:var(--accent-light);color:var(--accent);padding:8px 12px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px">
+      <span>${s.nombre}</span>
+      <button class="btn btn-ghost btn-xs" type="button" onclick="quitarServicioDeCita('${s.id}')" style="padding:2px 4px;color:var(--accent)">×</button>
+    </div>
+  `).join('');
+}
 
 async function guardarCita() {
   const btn = document.getElementById('btnGuardarCita');
   if (!document.getElementById('citaCliente').value) { toast('Selecciona una clienta', 'error'); return; }
   if (!document.getElementById('citaTecnica').value) { toast('Selecciona una Nail Tech', 'error'); return; }
-  if (!document.getElementById('citaServicio').value) { toast('Selecciona un servicio', 'error'); return; }
+  if (citaServiciosAgregados.length === 0) { toast('Agrega al menos un servicio', 'error'); return; }
   btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
   const payload = {
     id: citaEditando,
@@ -541,7 +574,7 @@ async function guardarCita() {
     hora: document.getElementById('citaHora').value,
     clienteId: document.getElementById('citaCliente').value,
     tecnicaId: document.getElementById('citaTecnica').value,
-    servicioId: document.getElementById('citaServicio').value,
+    servicios: citaServiciosAgregados,
     estado: document.getElementById('citaEstado').value,
     notas: document.getElementById('citaNotas').value,
   };
@@ -559,7 +592,9 @@ function verCita(id) {
   if (!citaSeleccionada) return;
   const c = citaSeleccionada;
   const cli = clientes.find(cl => cl.id === c.clienteId);
-  const svc = servicios.find(s => s.id === c.servicioId);
+  const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+  const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+  const precioTotal = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   const tec = tecnicos.find(t => t.id === c.tecnicaId);
   document.getElementById('detalleBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:12px">
@@ -573,8 +608,8 @@ function verCita(id) {
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Fecha y hora</div><div style="font-weight:600">${c.fecha} · ${formatHour(c.hora)}</div></div>
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Estado</div><span class="badge badge-${c.estado==='confirmada'?'success':c.estado==='cancelada'?'danger':c.estado==='completada'?'':c.estado==='secando'?'':' warning'}">${c.estado}</span></div>
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Nail Tech</div><div style="font-weight:600">${tec ? tec.nombre : '—'}</div></div>
-      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Servicio</div><div style="font-weight:600">${svc ? svc.nombre : '—'}</div></div>
-      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Precio base</div><div style="font-weight:700;color:var(--accent)">${svc ? '$' + Number(svc.precio).toLocaleString('es-MX') : '—'}</div></div>
+      <div style="grid-column:1/-1"><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Servicios</div><div style="display:flex;flex-wrap:wrap;gap:8px">${svcObjs.map(s => `<span style="background:var(--accent-light);color:var(--accent);padding:6px 10px;border-radius:5px;font-size:13px;font-weight:500">${s.nombre}</span>`).join('')}</div></div>
+      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Total servicios</div><div style="font-weight:700;color:var(--accent)">$${precioTotal.toLocaleString('es-MX')}</div></div>
     </div>
     ${c.estado === 'completada' && c.totalCobrado ? `
     <div style="background:var(--success-light);border-radius:9px;padding:12px 14px;border:1px solid rgba(55,158,122,.15)">
@@ -632,14 +667,16 @@ function enviarRecordatorio() {
 // ─── COBRO SPEI-FIRST ─────────────────────────────────────────────────────────
 function abrirCobro() {
   if (!citaSeleccionada) return;
-  const svc = servicios.find(s => s.id === citaSeleccionada.servicioId);
+  const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+  const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+  const precioTotal = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
   cobroMetodo = 'spei';
   cobroExtras = [];
   cobroDescuento = null;
   document.getElementById('cobroTitulo').textContent = `Cobro — ${cli ? cli.nombre.split(' ')[0] : 'Cliente'}`;
-  document.getElementById('cobroSvcNombre').textContent = svc ? svc.nombre : 'Servicio';
-  document.getElementById('cobroSvcPrecio').textContent = svc ? '$' + Number(svc.precio).toLocaleString('es-MX') : '$0';
+  document.getElementById('cobroSvcNombre').textContent = svcObjs.length > 1 ? `${svcObjs.length} servicios` : (svcObjs[0]?.nombre || 'Servicio');
+  document.getElementById('cobroSvcPrecio').textContent = '$' + precioTotal.toLocaleString('es-MX');
   document.getElementById('cobroPropina').value = '';
   document.getElementById('listaExtras').innerHTML = '';
   document.getElementById('descuentoBox').style.display = 'none';

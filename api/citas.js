@@ -5,17 +5,19 @@ import { requireAuth } from '../lib/auth.js';
 async function logEvento(cita, servicios) {
   try {
     const id = newId();
-    const svc = servicios?.find(s => s.id === cita.servicioId);
+    const citaServicios = cita.servicios || (cita.servicioId ? [{ id: cita.servicioId }] : []);
+    const svcObjs = citaServicios.map(s => servicios?.find(svc => svc.id === s.id)).filter(Boolean);
+    const montoServicios = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
     const evento = {
       id,
       tipo: 'cobro',
       fecha: cita.fecha,
       hora: cita.hora,
       clienteId: cita.clienteId,
-      servicioId: cita.servicioId,
-      servicioNombre: svc?.nombre || '',
+      servicios: citaServicios,
+      servicioNombre: svcObjs.map(s => s.nombre).join(', '),
       tecnicaId: cita.tecnicaId,
-      monto: cita.totalCobrado ?? (svc ? Number(svc.precio) : 0),
+      monto: cita.totalCobrado ?? montoServicios,
       metodoPago: cita.metodoPago || '',
       propina: cita.propina || 0,
       extras: cita.extras || 0,
@@ -61,8 +63,9 @@ export default async function handler(req, res) {
     const body = await parseBody(req);
 
     if (req.method === 'POST') {
-      if (!body.fecha || !body.hora || !body.clienteId || !body.tecnicaId || !body.servicioId) {
-        return res.status(400).json({ ok: false, error: 'Faltan campos requeridos: fecha, hora, clienteId, tecnicaId, servicioId' });
+      const servicios = body.servicios || (body.servicioId ? [{ id: body.servicioId }] : []);
+      if (!body.fecha || !body.hora || !body.clienteId || !body.tecnicaId || servicios.length === 0) {
+        return res.status(400).json({ ok: false, error: 'Faltan campos: fecha, hora, clienteId, tecnicaId, servicios (array con al menos 1 item)' });
       }
       const id = newId();
       const cita = {
@@ -71,7 +74,7 @@ export default async function handler(req, res) {
         hora: body.hora,
         clienteId: body.clienteId,
         tecnicaId: body.tecnicaId,
-        servicioId: body.servicioId,
+        servicios,
         estado: body.estado || 'pendiente',
         notas: body.notas || '',
         canalAgenda: body.canalAgenda || 'salon',
@@ -89,7 +92,7 @@ export default async function handler(req, res) {
       const existing = await redis.get(keys.cita(body.id));
       if (!existing) return res.status(404).json({ ok: false, error: 'Cita no encontrada' });
 
-      const editable = ['fecha','hora','clienteId','tecnicaId','servicioId','estado','notas',
+      const editable = ['fecha','hora','clienteId','tecnicaId','servicios','servicioId','estado','notas',
         'canalAgenda','campana','totalCobrado','metodoPago','propina','extras','montoBase',
         'descuento','descuentoRazon','descuentoAutorizadoPor','descuentoLogPendiente'];
       const patch = {};
