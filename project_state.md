@@ -3,6 +3,13 @@
 
 ---
 
+## [SESSION CHECKPOINT — 2026-05-04 ~ 19:15 CDT] 
+**Tipo:** Investigación + Reset a Producción  
+**Commits:** meraki-pos 33cb519 + LDS e65b73f (pusheados)  
+**Status:** READY FOR BRENDA TESTING
+
+---
+
 ## [RESET A DÍA CERO — 2026-05-04 ~ 19:10 CDT] ✅
 **Acción:** Sistema vaciado de datos demo para primer día de operación real
 **Script ejecutado:** `reset-to-day-zero.js --force`
