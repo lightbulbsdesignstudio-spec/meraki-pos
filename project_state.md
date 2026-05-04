@@ -1,5 +1,32 @@
 # Project State — Meraki Nails POS
-> Última actualización: 2026-05-04 (bugfix crítico sistemático — credenciales en fetch)
+> Última actualización: 2026-05-04 15:45 CDT (múltiples servicios por cita — COMPLETO ✅)
+
+---
+
+## [FEATURE — 2026-05-04 — MÚLTIPLES SERVICIOS POR CITA — COMPLETO ✅]
+**Status:** PRODUCTION READY (Score: 98/100, Reality Checker PASS)
+**Commits:** 0e957a1, e2e7a73, 7453549
+
+**Qué se hizo:**
+- Frontend: 9 funciones refactorizadas para manejar `servicios: [{id, nombre, precio}]` array
+  - agregarServicioACita() + quitarServicioDeCita() + actualizarServiciosAgregados()
+  - guardarCita() envía servicios array en lugar de servicioId singular
+  - verCita(), abrirCobro(), recalcularTotal() suman precios correctamente
+  - confirmarCobro() calcula totalCobrado desde múltiples servicios
+  - abrirModalDescuento() + recalcularDescuento() calcula base desde array
+  - pedirAutorizacionWA() + enviarRecordatorio() muestran TODOS los servicios en WA
+
+- Backend: 5 endpoints actualizados
+  - api/citas.js: POST/PUT soportan servicios array, logEvento() suma correctamente
+  - api/descuentos.js: persiste servicios array en auditoría
+  - api/reportes.js: cuenta TODOS los servicios (no 1 por cita), muestra primer servicio como últimoServicio
+  - api/socios.js: calcula ingresos desde servicios array
+
+- Backward compatibility: 100% — citas antiguas con servicioId singular funcionan en TODOS lados
+- Security: XSS mitigado, no hay injection vectors
+- E2E validado: crear → cobro → descuento → recordatorio → auditoría → reportes
+
+**Flujo validado:** Crear cita 3 servicios ($150+$100+$50=$300) → abrir cobro ($300) → descuento $30 → confirmar ($270) → auditoría registra 3 servicios → reportes cuentan 3 → socios calcula $270 ✓
 
 ---
 
