@@ -400,17 +400,17 @@ function toast(msg, type='') {
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 async function cargarTecnicas() {
-  try { const r = await fetch('/api/config?tipo=tecnicas'); const d = await r.json(); tecnicos = d.data || []; poblarSelectTecnicas(); } catch(e) {}
+  try { const r = await fetch('/api/config?tipo=tecnicas', { credentials:'same-origin' }); const d = await r.json(); tecnicos = d.data || []; poblarSelectTecnicas(); } catch(e) {}
 }
 async function cargarServicios() {
-  try { const r = await fetch('/api/config?tipo=servicios'); const d = await r.json(); servicios = d.data || []; } catch(e) {}
+  try { const r = await fetch('/api/config?tipo=servicios', { credentials:'same-origin' }); const d = await r.json(); servicios = d.data || []; } catch(e) {}
 }
 async function cargarClientes() {
-  try { const r = await fetch('/api/clientes'); const d = await r.json(); clientes = d.data || []; poblarSelectClientes(); } catch(e) {}
+  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; poblarSelectClientes(); } catch(e) {}
 }
 async function cargarCitas() {
   const fecha = formatDate(fechaActual);
-  try { const r = await fetch(`/api/citas?fecha=${fecha}`); const d = await r.json(); citas = d.data || []; } catch(e) {}
+  try { const r = await fetch(`/api/citas?fecha=${fecha}`, { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; } catch(e) {}
 }
 
 // ─── Selects ─────────────────────────────────────────────────────────────────
@@ -902,7 +902,7 @@ async function cargarWaitlistBody() {
   let body = '<div style="color:var(--text-muted);font-size:13.5px;text-align:center;padding:16px">Cargando...</div>';
   document.getElementById('waitlistBody').innerHTML = body;
   try {
-    const r = await fetch(`/api/waitlist?fecha=${fecha}&hora=${hora}&tecnicaId=${tecnicaId}`);
+    const r = await fetch(`/api/waitlist?fecha=${fecha}&hora=${hora}&tecnicaId=${tecnicaId}`, { credentials:'same-origin' });
     const d = await r.json();
     const items = d.data || [];
     if (!items.length) {
@@ -935,7 +935,7 @@ async function agregarWaitlist() {
   const cli = clientes.find(c => c.id === clienteId);
   const servicioId = document.getElementById('wlServicio').value;
   await fetch('/api/waitlist', {
-    method: 'POST', headers:{'Content-Type':'application/json'},
+    method: 'POST', headers:{'Content-Type':'application/json'}, credentials: 'same-origin',
     body: JSON.stringify({ ...wlSlot, clienteId, clienteNombre: cli?.nombre, clienteTel: cli?.tel, servicioId })
   });
   toast('Agregada a lista de espera', 'success');
@@ -944,7 +944,7 @@ async function agregarWaitlist() {
 async function quitarWaitlist(id) {
   if (!wlSlot) return;
   await fetch('/api/waitlist', {
-    method: 'DELETE', headers:{'Content-Type':'application/json'},
+    method: 'DELETE', headers:{'Content-Type':'application/json'}, credentials: 'same-origin',
     body: JSON.stringify({ id, ...wlSlot })
   });
   await cargarWaitlistBody();
