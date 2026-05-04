@@ -744,8 +744,12 @@ function renderExtras() {
     </div>`).join('');
 }
 function recalcularTotal() {
-  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
-  const base = svc ? Number(svc.precio) : 0;
+  let base = 0;
+  if (citaSeleccionada) {
+    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+    base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+  }
   const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
   const propina = parseFloat(document.getElementById('cobroPropina')?.value) || 0;
   const subtotal = base + extras;
@@ -766,8 +770,12 @@ function recalcularTotal() {
 
 // ─── Descuento con autorización WhatsApp ─────────────────────────
 function abrirModalDescuento() {
-  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
-  const base = svc ? Number(svc.precio) : 0;
+  let base = 0;
+  if (citaSeleccionada) {
+    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+    base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+  }
   const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
   document.getElementById('descTipo').value = 'monto';
   document.getElementById('descValor').value = '';
@@ -781,8 +789,12 @@ function abrirModalDescuento() {
   document.getElementById('modalDescuento').classList.add('open');
 }
 function recalcularDescuento() {
-  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
-  const base = svc ? Number(svc.precio) : 0;
+  let base = 0;
+  if (citaSeleccionada) {
+    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+    base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+  }
   const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
   const subtotal = base + extras;
   const tipo = document.getElementById('descTipo').value;
@@ -803,9 +815,16 @@ function pedirAutorizacionWA() {
     toast('Brenda no ha configurado su WhatsApp en Configuración', 'error');
     return;
   }
-  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
+  let base = 0;
+  let servicioNombres = '';
+  if (citaSeleccionada) {
+    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+    base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+    servicioNombres = svcObjs.map(s => s.nombre).join(', ');
+  }
   const cli = clientes.find(c => c.id === citaSeleccionada?.clienteId);
-  const subtotal = (svc ? Number(svc.precio) : 0) + cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
+  const subtotal = base + cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
   const monto = recalcularDescuento();
   const razon = document.getElementById('descRazon').value.trim();
   const usuario = (window.currentUser && window.currentUser.nombre) || 'una Nail Tech';
@@ -815,7 +834,7 @@ function pedirAutorizacionWA() {
     ``,
     `Te pido autorización para aplicar un descuento:`,
     `• Cliente: ${cli ? cli.nombre : 'sin cliente'}`,
-    `• Servicio: ${svc ? svc.nombre : '-'}`,
+    `• Servicios: ${servicioNombres || '-'}`,
     `• Subtotal: $${subtotal.toLocaleString('es-MX')}`,
     `• Descuento: $${monto.toLocaleString('es-MX')}`,
     `• Total final: $${(subtotal-monto).toLocaleString('es-MX')}`,
@@ -856,8 +875,14 @@ async function confirmarCobro() {
   if (!cobroMetodo) { toast('Selecciona método de pago', 'error'); return; }
   const btn = document.getElementById('btnConfirmarCobro');
   btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
-  const svc = servicios.find(s => s.id === citaSeleccionada.servicioId);
-  const montoBase = svc ? Number(svc.precio) : 0;
+
+  let montoBase = 0;
+  if (citaSeleccionada) {
+    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+    montoBase = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
+  }
+
   const propina = parseFloat(document.getElementById('cobroPropina').value) || 0;
   const extrasValidos = cobroExtras.filter(e => e.desc || e.precio);
   const totalExtras = extrasValidos.reduce((s,e) => s + (e.precio||0), 0);
