@@ -29,7 +29,24 @@
   - index.html:946 — quitarWaitlist() DELETE /api/waitlist
 
 **Patrón raíz:** Falta sistemática de `credentials: 'same-origin'` en TODOS los fetch(). Problema global, no localizado.
-**Acción requerida:** Brenda re-valida en https://meraki-pos.vercel.app (tras redeploy de c7efcbe): agendar cita debe cargar datos y permitir guardado
+
+**SECOND PASS (2026-05-04 15:30):** Auditoría completa de todos los HTMLs + assets
+- **clientes.html:** 4 GETs (cargarClientes, cargarCitas, cargarConfig) → ✅ ARREGLADOS commit fc45f70
+- **socios.html:** 1 GET (cargar()) → ✅ ARREGLADO commit fc45f70
+- **config.html:** ✅ AUDITADO — OK (todos tienen credentials)
+- **servicios.html:** ✅ AUDITADO — OK 
+- **reportes.html:** ✅ AUDITADO — OK
+- **login.html:** ✅ AUDITADO — OK
+- **session.js:** ✅ AUDITADO — OK
+
+**Total fallos encontrados:** 12 operaciones sin credenciales (fixes: 337be11 [5], c7efcbe [7], fc45f70 [5] = **17 correcciones totales**)
+
+**Acción requerida:** Brenda re-valida en https://meraki-pos.vercel.app (tras redeploy de fc45f70):
+- ✅ Registrar clienta
+- ✅ Registrar Nail Tech
+- ⏳ **Agendar cita — DEBE FUNCIONAR AHORA** (dependía de cargarCitas + cargarTecnicas + cargarServicios + cargarClientes)
+- Cambiar estado cita
+- Guardar socios (dependía de cargar() en socios.html)
 
 ---
 
