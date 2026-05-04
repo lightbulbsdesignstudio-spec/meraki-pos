@@ -1,34 +1,45 @@
 import redis, { keys, newId } from '../lib/redis.js';
-import { enviarWhatsApp } from '../lib/twilio.js';
 import parseBody from '../lib/parseBody.js';
+import { requireAuth } from '../lib/auth.js';
 
-async function notificarWaitlist(cita) {
+async function logEvento(cita, servicios) {
   try {
-    const tecnicaId = cita.tecnicaId || 'cualquiera';
-    const ids = await redis.smembers(keys.waitlist(cita.fecha, cita.hora, tecnicaId));
-    if (!ids.length) return;
-    const items = await Promise.all(ids.map(id => redis.get(keys.waitlistItem(id))));
-    const primero = items.filter(Boolean).sort((a, b) => a.creadoEn.localeCompare(b.creadoEn))[0];
-    if (!primero?.clienteTel) return;
-    const [h, m] = cita.hora.split(':');
-    const hr = parseInt(h);
-    const hora12 = `${hr > 12 ? hr - 12 : hr}:${m} ${hr >= 12 ? 'pm' : 'am'}`;
-    const msg = `Hola ${primero.clienteNombre?.split(' ')[0] || ''}! 💅 Se liberó un lugar para el ${cita.fecha} a las ${hora12}. ¿Quieres tu cita? Responde SÍ para apartar tu lugar. — N de Nails`;
-    await enviarWhatsApp(primero.clienteTel, msg);
+    const id = newId();
+    const svc = servicios?.find(s => s.id === cita.servicioId);
+    const evento = {
+      id,
+      tipo: 'cobro',
+      fecha: cita.fecha,
+      hora: cita.hora,
+      clienteId: cita.clienteId,
+      servicioId: cita.servicioId,
+      servicioNombre: svc?.nombre || '',
+      tecnicaId: cita.tecnicaId,
+      monto: cita.totalCobrado ?? (svc ? Number(svc.precio) : 0),
+      metodoPago: cita.metodoPago || '',
+      propina: cita.propina || 0,
+      extras: cita.extras || 0,
+      canalAgenda: cita.canalAgenda || 'salon',
+      campana: cita.campana || '',
+      creadoEn: new Date().toISOString(),
+    };
+    await redis.set(keys.evento(id), evento);
+    await redis.sadd(keys.eventos(), id);
   } catch (e) {
-    console.error('Error notificando waitlist:', e);
+    console.error('Error logging evento:', e);
   }
 }
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
+  const blocked = await requireAuth(req, res);
+  if (blocked) return;
 
   try {
     if (req.method === 'GET') {
-      const { fecha, all, salon, tecnicaId } = req.query;
+      const { fecha, all, tecnicaId } = req.query;
 
       if (all === '1') {
-        // Todas las citas (para reportes y clientes)
         const ids = await redis.smembers(keys.citas());
         if (!ids.length) return res.json({ ok: true, data: [] });
         const items = await Promise.all(ids.map(id => redis.get(keys.cita(id))));
@@ -40,7 +51,6 @@ export default async function handler(req, res) {
         if (!ids.length) return res.json({ ok: true, data: [] });
         const items = await Promise.all(ids.map(id => redis.get(keys.cita(id))));
         let data = items.filter(Boolean);
-        if (salon) data = data.filter(c => c.salonId === salon);
         if (tecnicaId) data = data.filter(c => c.tecnicaId === tecnicaId);
         return res.json({ ok: true, data });
       }
@@ -51,6 +61,9 @@ export default async function handler(req, res) {
     const body = await parseBody(req);
 
     if (req.method === 'POST') {
+      if (!body.fecha || !body.hora || !body.clienteId || !body.tecnicaId || !body.servicioId) {
+        return res.status(400).json({ ok: false, error: 'Faltan campos requeridos: fecha, hora, clienteId, tecnicaId, servicioId' });
+      }
       const id = newId();
       const cita = {
         id,
@@ -59,9 +72,10 @@ export default async function handler(req, res) {
         clienteId: body.clienteId,
         tecnicaId: body.tecnicaId,
         servicioId: body.servicioId,
-        salonId: body.salonId,
         estado: body.estado || 'pendiente',
         notas: body.notas || '',
+        canalAgenda: body.canalAgenda || 'salon',
+        campana: body.campana || '',
         creadoEn: new Date().toISOString(),
       };
       await redis.set(keys.cita(id), cita);
@@ -71,25 +85,47 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
+      if (!body.id) return res.status(400).json({ ok: false, error: 'id requerido' });
       const existing = await redis.get(keys.cita(body.id));
       if (!existing) return res.status(404).json({ ok: false, error: 'Cita no encontrada' });
 
-      // Si cambió la fecha, actualizar índices
-      if (existing.fecha !== body.fecha) {
+      const editable = ['fecha','hora','clienteId','tecnicaId','servicioId','estado','notas',
+        'canalAgenda','campana','totalCobrado','metodoPago','propina','extras','montoBase',
+        'descuento','descuentoRazon','descuentoAutorizadoPor','descuentoLogPendiente'];
+      const patch = {};
+      for (const k of editable) if (k in body) patch[k] = body[k];
+
+      if (patch.fecha && existing.fecha !== patch.fecha) {
         await redis.srem(keys.citasFecha(existing.fecha), body.id);
-        await redis.sadd(keys.citasFecha(body.fecha), body.id);
+        await redis.sadd(keys.citasFecha(patch.fecha), body.id);
       }
 
-      const updated = { ...existing, ...body, id: body.id };
+      const updated = { ...existing, ...patch, id: existing.id, creadoEn: existing.creadoEn };
       await redis.set(keys.cita(body.id), updated);
-      // Si se canceló, notificar al primero en waitlist
-      if (body.estado === 'cancelada' && existing.estado !== 'cancelada') {
-        notificarWaitlist(existing).catch(() => {});
+
+      // Cliente devuelve total visitas completadas para loyalty check (visita 10/20/30)
+      let totalVisitasCliente = null;
+      if (patch.estado === 'completada' && existing.estado !== 'completada') {
+        const servicioIds = await redis.smembers(keys.servicios());
+        const servicios = servicioIds.length
+          ? (await Promise.all(servicioIds.map(id => redis.get(keys.servicio(id))))).filter(Boolean)
+          : [];
+        await logEvento(updated, servicios);
+
+        if (updated.clienteId) {
+          const allIds = await redis.smembers(keys.citas());
+          const items = allIds.length
+            ? (await Promise.all(allIds.map(id => redis.get(keys.cita(id))))).filter(Boolean)
+            : [];
+          totalVisitasCliente = items.filter(c => c.clienteId === updated.clienteId && c.estado === 'completada').length;
+        }
       }
-      return res.json({ ok: true, data: updated });
+
+      return res.json({ ok: true, data: updated, totalVisitasCliente });
     }
 
     if (req.method === 'DELETE') {
+      if (!body.id) return res.status(400).json({ ok: false, error: 'id requerido' });
       const existing = await redis.get(keys.cita(body.id));
       if (existing) {
         await redis.srem(keys.citasFecha(existing.fecha), body.id);
@@ -105,4 +141,3 @@ export default async function handler(req, res) {
     res.status(500).json({ ok: false, error: e.message });
   }
 }
-

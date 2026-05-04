@@ -1,8 +1,11 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
+import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
+  const blocked = await requireAuth(req, res);
+  if (blocked) return;
 
   try {
     if (req.method === 'GET') {

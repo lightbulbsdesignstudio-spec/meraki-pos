@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuración — N de Nails</title>
+  <title>Configuración — Meraki Nails</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/assets/styles.css?v=4">
   <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}</style>
+  <script src="/assets/session.js" defer></script>
 </head>
-<body>
+<body data-page-rol="admin">
 <nav class="nav">
-  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-logo"><div class="brand">MERAKI NAILS</div><div class="sub">Sistema de gestión</div></div>
   <div class="nav-links">
     <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
     <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
-    <a href="/whatsapp.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/servicios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Servicios</a>
+
     <a href="/reportes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
-    <a href="/config.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+    <a data-rol="admin,socio" href="/socios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Socios</a>
+    <a data-rol="admin" href="/config.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
   </div>
-  <div class="nav-salones">
-    <div class="label">Salones</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
-  </div>
+
 </nav>
 
 <div class="main">
@@ -34,22 +33,23 @@
   </div>
   <div class="page">
     <!-- Tabs -->
-    <div style="display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content">
-      <button class="btn active-tab" id="tab-tecnicas" onclick="showTab('tecnicas')">Técnicas</button>
-      <button class="btn btn-ghost" id="tab-servicios" onclick="showTab('servicios')">Servicios</button>
+    <div style="display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content;flex-wrap:wrap">
+      <button class="btn btn-secondary" id="tab-tecnicas" onclick="showTab('tecnicas')">Nail Techs</button>
+      <button class="btn btn-ghost" id="tab-negocio" onclick="showTab('negocio')">Datos del negocio</button>
+      <button class="btn btn-ghost" id="tab-usuarios" onclick="showTab('usuarios')">Usuarios</button>
     </div>
 
     <!-- TÉCNICAS -->
     <div id="panel-tecnicas">
       <div class="card">
         <div class="card-header">
-          <span style="font-weight:600">Técnicas</span>
-          <button class="btn btn-primary btn-sm" onclick="abrirModalTecnica()">+ Agregar técnica</button>
+          <span style="font-weight:600">Nail Techs del salón</span>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalTecnica()">+ Agregar Nail Tech</button>
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>Nombre</th><th>Salón</th><th>Comisión</th><th>Estado</th><th>Acciones</th>
+              <th>Nombre</th><th>Comisión</th><th>Estado</th><th>Acciones</th>
             </tr></thead>
             <tbody id="tablaTecnicas"></tbody>
           </table>
@@ -57,22 +57,106 @@
       </div>
     </div>
 
-    <!-- SERVICIOS -->
-    <div id="panel-servicios" style="display:none">
+    <!-- NEGOCIO -->
+    <div id="panel-negocio" style="display:none">
+      <div class="card" style="max-width:720px">
+        <div class="card-header"><span style="font-weight:600">Datos del negocio</span></div>
+        <div style="padding:20px 24px">
+          <p style="color:var(--text-muted);font-size:14px;margin:0 0 20px">Estos datos se usan en el cobro SPEI y para autorizar descuentos por WhatsApp. Solo Brenda puede editarlos.</p>
+
+          <div style="display:grid;gap:18px">
+            <div>
+              <label style="font-size:13px;font-weight:500;color:var(--text-muted)">CLABE interbancaria</label>
+              <input id="negCLABE" type="text" inputmode="numeric" maxlength="18" placeholder="18 dígitos — necesaria para el cobro SPEI" style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif;letter-spacing:.5px">
+              <div style="font-size:12px;color:var(--text-light);margin-top:4px">Se la pides a tu banco. Sin esto, no se puede cobrar por SPEI.</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <label style="font-size:13px;font-weight:500;color:var(--text-muted)">Banco</label>
+                <input id="negBanco" type="text" placeholder="Ej. BBVA, Santander..." style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:500;color:var(--text-muted)">Titular de la cuenta</label>
+                <input id="negTitular" type="text" placeholder="Nombre completo" style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+              </div>
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:500;color:var(--text-muted)">WhatsApp de Brenda (autoriza descuentos)</label>
+              <input id="negWhats" type="text" placeholder="+52 55 4180 6736" style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:'DM Sans',sans-serif">
+              <div style="font-size:12px;color:var(--text-light);margin-top:4px">A este número se mandan las solicitudes de autorización de descuento.</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <label style="font-size:13px;font-weight:500;color:var(--text-muted)">Renta mensual ($)</label>
+                <input id="negRenta" type="number" min="0" style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:500;color:var(--text-muted)">Insumos mensual ($)</label>
+                <input id="negInsumos" type="number" min="0" style="width:100%;margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:15px">
+              </div>
+            </div>
+            <div style="margin-top:8px;display:flex;justify-content:flex-end">
+              <button class="btn btn-primary" onclick="guardarNegocio()">Guardar cambios</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div id="panel-usuarios" style="display:none">
       <div class="card">
         <div class="card-header">
-          <span style="font-weight:600">Servicios</span>
-          <button class="btn btn-primary btn-sm" onclick="abrirModalServicio()">+ Agregar servicio</button>
+          <span style="font-weight:600">Usuarios del sistema</span>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalUsuario()">+ Agregar usuario</button>
+        </div>
+        <div style="padding:14px 24px;font-size:13px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">
+          <strong>Roles:</strong> Admin (Brenda — todo + autoriza descuentos) · Nail Tech (agenda, clientes, reportes) · Socio (solo lectura, ven todo el sistema)
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>Servicio</th><th>Duración</th><th>Precio</th><th>Categoría</th><th>Acciones</th>
+              <th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th>Acciones</th>
             </tr></thead>
-            <tbody id="tablaServicios"></tbody>
+            <tbody id="tablaUsuarios"></tbody>
           </table>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL USUARIO -->
+<div class="modal-backdrop" id="modalUsuario">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tituloUsuario">Nuevo usuario</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalUsuario')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre completo</label><input id="usrNombre" type="text" placeholder="Ej. Moni López"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Usuario</label><input id="usrUsername" type="text" placeholder="moni" autocomplete="off"></div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="usrRol">
+            <option value="empleada">Nail Tech</option>
+            <option value="socio">Socio</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Contraseña <span id="usrPassHint" style="color:var(--text-muted);font-weight:400">(mínimo 6 caracteres)</span></label>
+        <input id="usrPassword" type="text" placeholder="meraki2026">
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px"><input id="usrActivo" type="checkbox" checked> Activo (puede iniciar sesión)</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalUsuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
     </div>
   </div>
 </div>
@@ -81,25 +165,18 @@
 <div class="modal-backdrop" id="modalTecnica">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="tituloTecnica">Nueva técnica</h3>
+      <h3 id="tituloTecnica">Nueva Nail Tech</h3>
       <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalTecnica')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-group"><label>Nombre completo</label><input id="tecNombre" placeholder="Nombre de la técnica"></div>
-      <div class="form-group">
-        <label>Salón</label>
-        <select id="tecSalon">
-          <option value="vs">Vicente Suárez</option>
-          <option value="jb">Juan de la Barrera</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Nombre completo</label><input id="tecNombre" placeholder="Nombre de la Nail Tech"></div>
       <div class="grid-2">
         <div class="form-group"><label>Teléfono (opcional)</label><input id="tecTel" placeholder="55 1234 5678"></div>
         <div class="form-group"><label>Comisión (%)</label><input id="tecComision" type="number" min="0" max="100" placeholder="40"></div>
       </div>
       <div class="form-group" style="flex-direction:row;align-items:center;gap:10px">
         <input type="checkbox" id="tecActiva" checked style="width:16px;height:16px">
-        <label for="tecActiva" style="margin:0">Técnica activa</label>
+        <label for="tecActiva" style="margin:0">Nail Tech activa</label>
       </div>
     </div>
     <div class="modal-footer">
@@ -109,68 +186,27 @@
   </div>
 </div>
 
-<!-- MODAL SERVICIO -->
-<div class="modal-backdrop" id="modalServicio">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="tituloServicio">Nuevo servicio</h3>
-      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalServicio')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group"><label>Nombre del servicio</label><input id="svcNombre" placeholder="Ej: Mano completa gel color"></div>
-      <div class="grid-2">
-        <div class="form-group"><label>Precio ($)</label><input id="svcPrecio" type="number" placeholder="350"></div>
-        <div class="form-group"><label>Duración (minutos)</label><input id="svcDuracion" type="number" placeholder="60"></div>
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select id="svcCategoria">
-          <option value="manicure">Manicure</option>
-          <option value="pedicure">Pedicure</option>
-          <option value="gel">Gel</option>
-          <option value="acrílico">Acrílico</option>
-          <option value="nail-art">Nail Art</option>
-          <option value="diseño">Diseño especial</option>
-          <option value="otro">Otro</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Descripción (opcional)</label><textarea id="svcDesc" placeholder="Descripción del servicio..."></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="cerrarModal('modalServicio')">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarServicio()">Guardar</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast-container" id="toasts"></div>
 
 <script>
-let tecnicas = [], servicios = [], editTecnica = null, editServicio = null;
+let tecnicas = [], editTecnica = null;
 
 async function init() {
-  await Promise.all([cargarTecnicas(), cargarServicios()]);
+  await cargarTecnicas();
 }
 
 async function cargarTecnicas() {
-  const r = await fetch('/api/config?tipo=tecnicas');
+  const r = await fetch('/api/config?tipo=tecnicas', { credentials: 'same-origin' });
   const d = await r.json();
   tecnicas = d.data || [];
   renderTecnicas();
 }
-async function cargarServicios() {
-  const r = await fetch('/api/config?tipo=servicios');
-  const d = await r.json();
-  servicios = d.data || [];
-  renderServicios();
-}
 
 function renderTecnicas() {
   const tb = document.getElementById('tablaTecnicas');
-  if(!tecnicas.length) { tb.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">💅</div><p>Sin técnicas. Agrega la primera.</p></div></td></tr>`; return; }
+  if(!tecnicas.length) { tb.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C9 2 7 4 7 7v10c0 2 1 3 3 3h4c2 0 3-1 3-3V7c0-3-2-5-5-5z"/></svg></div><p>Sin Nail Techs. Agrega la primera.</p></div></td></tr>`; return; }
   tb.innerHTML = tecnicas.map(t => `<tr>
     <td><strong>${t.nombre}</strong>${t.tel ? `<br><span style="color:var(--text-muted);font-size:12px">${t.tel}</span>` : ''}</td>
-    <td><span class="badge badge-${t.salonId === 'vs' ? 'vs' : 'jb'}">${t.salonId === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera'}</span></td>
     <td><strong style="color:var(--accent)">${t.comision ? t.comision + '%' : '<span style="color:var(--text-muted)">—</span>'}</strong></td>
     <td><span class="badge ${t.activa ? 'badge-success' : 'badge-warning'}">${t.activa ? 'Activa' : 'Inactiva'}</span></td>
     <td>
@@ -180,34 +216,132 @@ function renderTecnicas() {
   </tr>`).join('');
 }
 
-function renderServicios() {
-  const tb = document.getElementById('tablaServicios');
-  if(!servicios.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin servicios. Agrega el primero.</p></div></td></tr>`; return; }
-  tb.innerHTML = servicios.map(s => `<tr>
-    <td><strong>${s.nombre}</strong>${s.desc ? `<br><span style="color:var(--text-muted);font-size:12px">${s.desc}</span>` : ''}</td>
-    <td>${s.duracion} min</td>
-    <td style="font-weight:700;color:var(--accent)">$${s.precio}</td>
-    <td><span class="badge badge-accent">${s.categoria}</span></td>
-    <td>
-      <button class="btn btn-ghost btn-sm" onclick='editarServicio(${JSON.stringify(s)})'>Editar</button>
-      <button class="btn btn-ghost btn-sm" onclick="eliminarServicio('${s.id}')" style="color:var(--danger)">Eliminar</button>
-    </td>
-  </tr>`).join('');
-}
-
 function showTab(tab) {
-  ['tecnicas','servicios'].forEach(t => {
+  ['tecnicas','negocio','usuarios'].forEach(t => {
     document.getElementById('panel-' + t).style.display = t === tab ? '' : 'none';
     document.getElementById('tab-' + t).className = t === tab ? 'btn btn-secondary' : 'btn btn-ghost';
   });
+  if (tab === 'negocio') cargarNegocio();
+  if (tab === 'usuarios') cargarUsuarios();
 }
 
-// Técnicas CRUD
+// ─── Datos del negocio ────────────────────────────────────────────
+let negocioCfg = null;
+async function cargarNegocio() {
+  const r = await fetch('/api/config-negocio', { credentials: 'same-origin' });
+  const d = await r.json();
+  if (!d.ok) { toast(d.error || 'Error al cargar', 'error'); return; }
+  negocioCfg = d.data;
+  document.getElementById('negCLABE').value = d.data.clabe || '';
+  document.getElementById('negBanco').value = d.data.banco || '';
+  document.getElementById('negTitular').value = d.data.titular || '';
+  document.getElementById('negWhats').value = d.data.whatsappBrenda || '';
+  document.getElementById('negRenta').value = d.data.rentaMensual ?? 33500;
+  document.getElementById('negInsumos').value = d.data.insumosMensual ?? 1000;
+}
+async function guardarNegocio() {
+  const payload = {
+    clabe: document.getElementById('negCLABE').value.trim(),
+    banco: document.getElementById('negBanco').value.trim(),
+    titular: document.getElementById('negTitular').value.trim(),
+    whatsappBrenda: document.getElementById('negWhats').value.trim(),
+    rentaMensual: Number(document.getElementById('negRenta').value),
+    insumosMensual: Number(document.getElementById('negInsumos').value),
+  };
+  const r = await fetch('/api/config-negocio', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify(payload),
+  });
+  const d = await r.json();
+  if (d.ok) { toast('Datos guardados', 'success'); negocioCfg = d.data; }
+  else toast(d.error || 'Error al guardar', 'error');
+}
+
+// ─── Usuarios ────────────────────────────────────────────────────
+let usuarios = [], editUsuario = null;
+async function cargarUsuarios() {
+  const r = await fetch('/api/users', { credentials: 'same-origin' });
+  const d = await r.json();
+  if (!d.ok) { toast(d.error || 'Error', 'error'); return; }
+  usuarios = d.data || [];
+  renderUsuarios();
+}
+function rolLabel(r) {
+  return r === 'admin' ? '<span class="badge badge-accent">Admin</span>'
+    : r === 'socio' ? '<span class="badge" style="background:#FEF3C7;color:#92400E">Socio</span>'
+    : '<span class="badge" style="background:#DBEAFE;color:#1E40AF">Empleada</span>';
+}
+function renderUsuarios() {
+  const tb = document.getElementById('tablaUsuarios');
+  if (!usuarios.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin usuarios.</p></div></td></tr>`; return; }
+  tb.innerHTML = usuarios.map(u => `<tr>
+    <td><strong>${u.nombre}</strong></td>
+    <td><code style="font-size:12px;background:var(--surface-2);padding:2px 6px;border-radius:4px">${u.username}</code></td>
+    <td>${rolLabel(u.rol)}</td>
+    <td><span class="badge ${u.activo ? 'badge-success' : 'badge-warning'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick='editarUsuario(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Editar</button>
+      ${window.currentUser && window.currentUser.id !== u.id ? `<button class="btn btn-ghost btn-sm" onclick="eliminarUsuario('${u.id}','${u.nombre.replace(/'/g, "&#39;")}')" style="color:var(--danger)">Eliminar</button>` : ''}
+    </td>
+  </tr>`).join('');
+}
+function abrirModalUsuario(data = {}) {
+  editUsuario = data.id || null;
+  document.getElementById('tituloUsuario').textContent = editUsuario ? 'Editar usuario' : 'Nuevo usuario';
+  document.getElementById('usrNombre').value = data.nombre || '';
+  document.getElementById('usrUsername').value = data.username || '';
+  document.getElementById('usrUsername').disabled = !!editUsuario;
+  document.getElementById('usrRol').value = data.rol || 'empleada';
+  document.getElementById('usrPassword').value = '';
+  document.getElementById('usrPassHint').textContent = editUsuario ? '(dejar vacío si no quieres cambiarla)' : '(mínimo 6 caracteres)';
+  document.getElementById('usrActivo').checked = data.activo !== false;
+  document.getElementById('modalUsuario').classList.add('open');
+}
+function editarUsuario(u) { abrirModalUsuario(u); }
+async function guardarUsuario() {
+  const nombre = document.getElementById('usrNombre').value.trim();
+  const username = document.getElementById('usrUsername').value.trim().toLowerCase();
+  const rol = document.getElementById('usrRol').value;
+  const password = document.getElementById('usrPassword').value;
+  const activo = document.getElementById('usrActivo').checked;
+
+  if (!nombre || (!editUsuario && !username)) { toast('Faltan datos', 'error'); return; }
+  if (!editUsuario && password.length < 6) { toast('Contraseña mínimo 6 caracteres', 'error'); return; }
+
+  const payload = editUsuario
+    ? { id: editUsuario, nombre, rol, activo, ...(password ? { password } : {}) }
+    : { nombre, username, rol, activo, password };
+
+  const r = await fetch('/api/users', {
+    method: editUsuario ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify(payload),
+  });
+  const d = await r.json();
+  if (d.ok) { toast('Guardado', 'success'); cerrarModal('modalUsuario'); await cargarUsuarios(); }
+  else toast(d.error || 'Error', 'error');
+}
+async function eliminarUsuario(id, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return;
+  const r = await fetch('/api/users', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ id }),
+  });
+  const d = await r.json();
+  if (d.ok) { toast('Eliminado', 'success'); await cargarUsuarios(); }
+  else toast(d.error || 'Error', 'error');
+}
+
+// Nail Techs CRUD
 function abrirModalTecnica(data = {}) {
   editTecnica = data.id || null;
-  document.getElementById('tituloTecnica').textContent = editTecnica ? 'Editar técnica' : 'Nueva técnica';
+  document.getElementById('tituloTecnica').textContent = editTecnica ? 'Editar Nail Tech' : 'Nueva Nail Tech';
   document.getElementById('tecNombre').value = data.nombre || '';
-  document.getElementById('tecSalon').value = data.salonId || 'vs';
   document.getElementById('tecTel').value = data.tel || '';
   document.getElementById('tecComision').value = data.comision || '';
   document.getElementById('tecActiva').checked = data.activa !== false;
@@ -217,45 +351,16 @@ function editarTecnica(t) { abrirModalTecnica(t); }
 async function guardarTecnica() {
   const nombre = document.getElementById('tecNombre').value.trim();
   if(!nombre) { toast('Escribe el nombre', 'error'); return; }
-  const payload = { id: editTecnica, nombre, salonId: document.getElementById('tecSalon').value, tel: document.getElementById('tecTel').value, comision: parseFloat(document.getElementById('tecComision').value) || 0, activa: document.getElementById('tecActiva').checked };
-  const r = await fetch('/api/config', { method: editTecnica ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'tecnica', ...payload}) });
+  const payload = { id: editTecnica, nombre, tel: document.getElementById('tecTel').value, comision: parseFloat(document.getElementById('tecComision').value) || 0, activa: document.getElementById('tecActiva').checked };
+  const r = await fetch('/api/config', { method: editTecnica ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, credentials: 'same-origin', body: JSON.stringify({tipo:'tecnica', ...payload}) });
   const d = await r.json();
   if(d.ok) { toast('Guardado', 'success'); cerrarModal('modalTecnica'); await cargarTecnicas(); }
   else toast(d.error || 'Error', 'error');
 }
 async function toggleTecnica(id, activa) {
   const t = tecnicas.find(x => x.id === id);
-  await fetch('/api/config', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'tecnica', ...t, activa}) });
+  await fetch('/api/config', { method: 'PUT', headers: {'Content-Type':'application/json'}, credentials: 'same-origin', body: JSON.stringify({tipo:'tecnica', ...t, activa}) });
   await cargarTecnicas();
-}
-
-// Servicios CRUD
-function abrirModalServicio(data = {}) {
-  editServicio = data.id || null;
-  document.getElementById('tituloServicio').textContent = editServicio ? 'Editar servicio' : 'Nuevo servicio';
-  document.getElementById('svcNombre').value = data.nombre || '';
-  document.getElementById('svcPrecio').value = data.precio || '';
-  document.getElementById('svcDuracion').value = data.duracion || '';
-  document.getElementById('svcCategoria').value = data.categoria || 'manicure';
-  document.getElementById('svcDesc').value = data.desc || '';
-  document.getElementById('modalServicio').classList.add('open');
-}
-function editarServicio(s) { abrirModalServicio(s); }
-async function guardarServicio() {
-  const nombre = document.getElementById('svcNombre').value.trim();
-  const precio = parseFloat(document.getElementById('svcPrecio').value);
-  const duracion = parseInt(document.getElementById('svcDuracion').value);
-  if(!nombre || !precio || !duracion) { toast('Completa todos los campos', 'error'); return; }
-  const payload = { id: editServicio, nombre, precio, duracion, categoria: document.getElementById('svcCategoria').value, desc: document.getElementById('svcDesc').value };
-  const r = await fetch('/api/config', { method: editServicio ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'servicio', ...payload}) });
-  const d = await r.json();
-  if(d.ok) { toast('Guardado', 'success'); cerrarModal('modalServicio'); await cargarServicios(); }
-  else toast(d.error || 'Error', 'error');
-}
-async function eliminarServicio(id) {
-  if(!confirm('¿Eliminar servicio?')) return;
-  await fetch('/api/config', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({tipo:'servicio', id}) });
-  await cargarServicios();
 }
 
 function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -282,7 +387,7 @@ init();
   var items=[
     ['agenda','/index.html','Agenda','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'],
     ['clientes','/clientes.html','Clientes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'],
-    ['whatsapp','/whatsapp.html','WhatsApp','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'],
+    
     ['reportes','/reportes.html','Reportes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'],
     ['config','/config.html','Config','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>'],
   ];

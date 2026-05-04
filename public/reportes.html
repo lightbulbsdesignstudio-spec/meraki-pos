@@ -3,28 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reportes — N de Nails</title>
+  <title>Reportes — Meraki Nails</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/assets/styles.css?v=4">
-  <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}</style>
+  <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}
+  @media print {
+    .nav, .topbar, .nav-bottom, .user-badge, .topbar-actions { display: none !important; }
+    .main { margin-left: 0 !important; }
+    .page { padding: 0 !important; }
+    body { background: white !important; }
+    .card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; }
+    h1, h2, h3 { color: black !important; }
+    @page { size: A4; margin: 1.5cm; }
+  }
+  .print-header { display: none; }
+  @media print { .print-header { display: block; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; } }
+  </style>
+  <script src="/assets/session.js" defer></script>
 </head>
 <body>
 <nav class="nav">
-  <div class="nav-logo"><div class="brand">N DE NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-logo"><div class="brand">MERAKI NAILS</div><div class="sub">Sistema de gestión</div></div>
   <div class="nav-links">
     <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
     <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
-    <a href="/whatsapp.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>WhatsApp IA</a>
+    <a href="/servicios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Servicios</a>
+
     <a href="/reportes.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
-    <a href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+    <a data-rol="admin,socio" href="/socios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Socios</a>
+    <a data-rol="admin" href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
   </div>
-  <div class="nav-salones">
-    <div class="label">Salones</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
-  </div>
+
 </nav>
 
 <div class="main">
@@ -33,36 +44,49 @@
     <h1>Reportes</h1>
     <div class="topbar-actions">
       <select id="periodoSelect" onchange="cargarReportes()" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface)">
+        <option value="dia">Hoy</option>
+        <option value="ayer">Ayer</option>
         <option value="semana">Esta semana</option>
         <option value="mes" selected>Este mes</option>
         <option value="mes_anterior">Mes anterior</option>
+        <option value="anio">Año en curso</option>
         <option value="total">Todo el tiempo</option>
       </select>
+      <button class="btn btn-secondary" onclick="imprimirReporte()" title="Genera versión imprimible o PDF">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Generar reporte
+      </button>
     </div>
   </div>
 
   <div class="page">
+    <!-- Header de impresión (oculto en pantalla) -->
+    <div class="print-header">
+      <h1 style="margin:0;font-size:24px">Meraki Nails — Reporte</h1>
+      <div id="printMeta" style="font-size:13px;color:#555;margin-top:4px"></div>
+    </div>
+
     <!-- KPIs generales -->
     <div class="grid-4" id="kpis" style="margin-bottom:24px"></div>
 
     <div class="grid-2" style="margin-bottom:24px">
-      <!-- Por salón -->
-      <div class="card">
-        <div class="card-header"><span style="font-weight:600">Por salón</span></div>
-        <div class="card-body" id="reporteSalones"></div>
-      </div>
       <!-- Métodos de pago -->
       <div class="card">
         <div class="card-header"><span style="font-weight:600">Métodos de pago</span></div>
         <div class="card-body" id="reportePagos"></div>
       </div>
+      <!-- Canales de agenda -->
+      <div class="card">
+        <div class="card-header"><span style="font-weight:600">¿Cómo se agendan?</span></div>
+        <div class="card-body" id="reporteCanales"></div>
+      </div>
     </div>
 
     <div class="card" style="margin-bottom:24px">
-      <div class="card-header"><span style="font-weight:600">Por técnica — ingresos y comisiones</span></div>
+      <div class="card-header"><span style="font-weight:600">Por Nail Tech — ingresos y comisiones</span></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Técnica</th><th>Salón</th><th>Citas</th><th>Ingresos</th><th>Comisión</th><th>A pagar</th></tr></thead>
+          <thead><tr><th>Nail Tech</th><th>Citas</th><th>Ingresos</th><th>Comisión %</th><th>A pagar</th></tr></thead>
           <tbody id="reporteTecnicasTabla"></tbody>
         </table>
       </div>
@@ -82,12 +106,28 @@
     </div>
 
     <!-- Clientes top -->
-    <div class="card">
+    <div class="card" style="margin-bottom:24px">
       <div class="card-header"><span style="font-weight:600">Clientas más frecuentes</span></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Clienta</th><th>Visitas</th><th>Gasto estimado</th><th>Último servicio</th><th>Salón</th></tr></thead>
+          <thead><tr><th>Clienta</th><th>Visitas</th><th>Gasto estimado</th><th>Último servicio</th></tr></thead>
           <tbody id="reporteClientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Descuentos (auditoría Brenda) -->
+    <div class="card" data-rol="admin,socio">
+      <div class="card-header">
+        <span style="font-weight:600">Descuentos aplicados (auditoría)</span>
+        <span style="font-size:12px;color:var(--text-muted)" id="descuentosResumen"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Original</th><th>Descuento</th><th>Final</th><th>Razón</th><th>Autorizado por</th><th>Vía</th><th>Capturado por</th>
+          </tr></thead>
+          <tbody id="tablaDescuentos"></tbody>
         </table>
       </div>
     </div>
@@ -99,14 +139,73 @@
 async function cargarReportes() {
   const periodo = document.getElementById('periodoSelect').value;
   try {
-    const r = await fetch(`/api/reportes?periodo=${periodo}`);
+    const r = await fetch(`/api/reportes?periodo=${periodo}`, { credentials: 'same-origin' });
     const d = await r.json();
     renderReportes(d.data || {});
+    await cargarDescuentos(d.data?.kpis?.desde, d.data?.kpis?.hasta, d.data?.kpis?.periodoLabel);
   } catch(e) { console.error(e); }
 }
 
+async function cargarDescuentos(desde, hasta, periodoLabel) {
+  try {
+    const params = new URLSearchParams();
+    if (desde) params.set('desde', desde);
+    if (hasta) params.set('hasta', hasta);
+    const r = await fetch('/api/descuentos?' + params.toString(), { credentials: 'same-origin' });
+    const d = await r.json();
+    const list = d.data || [];
+    const tb = document.getElementById('tablaDescuentos');
+    const resumen = document.getElementById('descuentosResumen');
+    if (!list.length) {
+      tb.innerHTML = `<tr><td colspan="10"><div class="empty"><p>Sin descuentos en el período</p></div></td></tr>`;
+      if (resumen) resumen.textContent = `0 descuentos · ${periodoLabel || ''}`;
+      return;
+    }
+    const totalDesc = list.reduce((s, x) => s + (x.monto || 0), 0);
+    if (resumen) resumen.textContent = `${list.length} descuentos · $${totalDesc.toLocaleString('es-MX')} otorgados · ${periodoLabel || ''}`;
+    const viaLabel = v => v === 'whatsapp' ? 'WhatsApp' : v === 'voz' ? 'Voz' : v === 'presencial' ? 'Presencial' : 'Pendiente';
+    tb.innerHTML = list.map(d => `<tr>
+      <td>${d.fecha || '—'}</td>
+      <td>${escapeHtml(clienteNombrePorId(d.clienteId))}</td>
+      <td>${escapeHtml(servicioNombrePorId(d.servicioId))}</td>
+      <td>$${(d.montoOriginal||0).toLocaleString('es-MX')}</td>
+      <td style="color:var(--accent);font-weight:600">- $${(d.monto||0).toLocaleString('es-MX')}</td>
+      <td><strong>$${(d.montoFinal||0).toLocaleString('es-MX')}</strong></td>
+      <td>${escapeHtml(d.razon || '—')}</td>
+      <td>${escapeHtml(d.autorizadoPor || '—')}</td>
+      <td><span class="badge" style="background:var(--accent-light);color:var(--accent)">${viaLabel(d.via)}</span></td>
+      <td style="color:var(--text-muted);font-size:12px">${escapeHtml(d.capturadoPorNombre || d.capturadoPor || '—')}</td>
+    </tr>`).join('');
+  } catch (e) { console.error(e); }
+}
+
+let _clientesCache = null, _serviciosCache = null;
+async function ensureCaches() {
+  if (!_clientesCache) {
+    const r = await fetch('/api/clientes', { credentials: 'same-origin' });
+    const d = await r.json();
+    _clientesCache = (d.data || []).reduce((a, c) => (a[c.id] = c, a), {});
+  }
+  if (!_serviciosCache) {
+    const r = await fetch('/api/config?tipo=servicios', { credentials: 'same-origin' });
+    const d = await r.json();
+    _serviciosCache = (d.data || []).reduce((a, s) => (a[s.id] = s, a), {});
+  }
+}
+function clienteNombrePorId(id) { return (_clientesCache && _clientesCache[id]?.nombre) || (id ? '—' : '—'); }
+function servicioNombrePorId(id) { return (_serviciosCache && _serviciosCache[id]?.nombre) || '—'; }
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+ensureCaches();
+
+function imprimirReporte() {
+  const periodoLabel = document.getElementById('periodoSelect').selectedOptions[0]?.textContent || '';
+  const ahora = new Date().toLocaleString('es-MX', { dateStyle: 'long', timeStyle: 'short' });
+  document.getElementById('printMeta').innerHTML = `<strong>Período:</strong> ${periodoLabel} · <strong>Generado:</strong> ${ahora}${window.currentUser ? ' · <strong>Por:</strong> ' + window.currentUser.nombre : ''}`;
+  setTimeout(() => window.print(), 100);
+}
+
 function renderReportes(d) {
-  const { kpis = {}, salones = [], tecnicas = [], servicios = [], ocupacion = {}, clientes = [], pagos = {} } = d;
+  const { kpis = {}, tecnicas = [], servicios = [], ocupacion = {}, clientes = [], pagos = {}, canales = {} } = d;
 
   // KPIs
   document.getElementById('kpis').innerHTML = `
@@ -117,43 +216,30 @@ function renderReportes(d) {
     </div>
     <div class="stat-card" style="border-top:3px solid var(--success)">
       <div class="stat-label">Ingresos estimados</div>
-      <div class="stat-value" style="color:var(--success)">$${(kpis.ingresos || 0).toLocaleString()}</div>
+      <div class="stat-value" style="color:var(--success)">$${(kpis.ingresos || 0).toLocaleString('es-MX')}</div>
       <div class="stat-sub">basado en precios de servicios</div>
     </div>
-    <div class="stat-card stat-vs">
+    <div class="stat-card" style="border-top:3px solid var(--accent)">
       <div class="stat-label">Ticket promedio</div>
-      <div class="stat-value" style="color:var(--vs)">$${kpis.ticketPromedio || 0}</div>
+      <div class="stat-value" style="color:var(--accent)">$${(kpis.ticketPromedio || 0).toLocaleString('es-MX')}</div>
     </div>
-    <div class="stat-card stat-jb">
+    <div class="stat-card" style="border-top:3px solid var(--accent-mid)">
       <div class="stat-label">Clientas nuevas</div>
-      <div class="stat-value" style="color:var(--jb)">${kpis.clientasNuevas || 0}</div>
+      <div class="stat-value" style="color:var(--accent)">${kpis.clientasNuevas || 0}</div>
     </div>
   `;
 
-  // Por salón
-  document.getElementById('reporteSalones').innerHTML = salones.length ? salones.map(s => `
-    <div style="margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span class="badge badge-${s.id === 'vs' ? 'vs' : 'jb'}">${s.nombre}</span>
-        <strong>${s.citas} citas · $${s.ingresos.toLocaleString()}</strong>
-      </div>
-      <div style="background:var(--surface-2);border-radius:4px;height:8px;overflow:hidden">
-        <div style="height:100%;background:var(--${s.id === 'vs' ? 'vs' : 'jb'});width:${s.pct}%;border-radius:4px"></div>
-      </div>
-    </div>`).join('') : '<div class="empty"><p>Sin datos</p></div>';
-
-  // Por técnica — tabla con comisiones
+  // Por Nail Tech — tabla con comisiones
   const tbTec = document.getElementById('reporteTecnicasTabla');
   if (!tecnicas.length) {
-    tbTec.innerHTML = `<tr><td colspan="6"><div class="empty"><p>Sin datos</p></div></td></tr>`;
+    tbTec.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin datos</p></div></td></tr>`;
   } else {
     tbTec.innerHTML = tecnicas.map(t => `<tr>
       <td><strong>${t.nombre}</strong></td>
-      <td><span class="badge badge-${t.salonId === 'vs' ? 'vs' : 'jb'}">${t.salonId === 'vs' ? 'VS' : 'JB'}</span></td>
       <td><strong>${t.citas}</strong></td>
-      <td style="font-weight:700;color:var(--accent)">$${t.ingresos.toLocaleString()}</td>
+      <td style="font-weight:700;color:var(--accent)">$${t.ingresos.toLocaleString('es-MX')}</td>
       <td style="color:var(--text-muted)">${t.comisionPct ? t.comisionPct + '%' : '—'}</td>
-      <td style="font-weight:700;color:var(--success)">${t.comisionMonto ? '$' + t.comisionMonto.toLocaleString() : '—'}</td>
+      <td style="font-weight:700;color:var(--success)">${t.comisionMonto ? '$' + t.comisionMonto.toLocaleString('es-MX') : '—'}</td>
     </tr>`).join('');
   }
 
@@ -163,21 +249,43 @@ function renderReportes(d) {
   document.getElementById('reportePagos').innerHTML = totalPagos ? `
     <div style="display:flex;flex-direction:column;gap:12px">
       ${[
-        { label: '💵 Efectivo', val: pagos.efectivo||0, color: 'var(--success)' },
-        { label: '📲 Transferencia', val: pagos.transferencia||0, color: 'var(--vs)' },
-        { label: '💳 Tarjeta', val: pagos.tarjeta||0, color: 'var(--jb)' },
+        { label: 'Efectivo', val: pagos.efectivo||0, color: 'var(--success)' },
+        { label: 'Transferencia (SPEI)', val: pagos.transferencia||0, color: 'var(--accent)' },
+        { label: 'Tarjeta', val: pagos.tarjeta||0, color: 'var(--warning)' },
         ...(pagos.sinRegistro ? [{ label: 'Sin registro', val: pagos.sinRegistro, color: 'var(--border)' }] : []),
       ].map(x => `
         <div>
           <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px">
             <span>${x.label}</span>
-            <span><strong>$${x.val.toLocaleString()}</strong> <span style="color:var(--text-muted)">(${pct(x.val)}%)</span></span>
+            <span><strong>$${x.val.toLocaleString('es-MX')}</strong> <span style="color:var(--text-muted)">(${pct(x.val)}%)</span></span>
           </div>
           <div style="background:var(--surface-2);border-radius:4px;height:6px">
             <div style="height:100%;background:${x.color};width:${pct(x.val)}%;border-radius:4px"></div>
           </div>
         </div>`).join('')}
     </div>` : '<div class="empty"><p>Sin cobros registrados en el período</p></div>';
+
+  // Canales (cómo se agendan)
+  const totalCanales = (canales.salon||0) + (canales.whatsapp||0) + (canales.instagram||0) + (canales.otro||0);
+  const pctCanal = v => totalCanales ? Math.round(v/totalCanales*100) : 0;
+  document.getElementById('reporteCanales').innerHTML = totalCanales ? `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${[
+        { label: 'Presencial / Salón', val: canales.salon||0, color: 'var(--accent)' },
+        { label: 'WhatsApp', val: canales.whatsapp||0, color: '#25D366' },
+        { label: 'Instagram', val: canales.instagram||0, color: '#E1306C' },
+        ...(canales.otro ? [{ label: 'Otro', val: canales.otro, color: 'var(--text-muted)' }] : []),
+      ].map(x => `
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px">
+            <span>${x.label}</span>
+            <span><strong>${x.val}</strong> (${pctCanal(x.val)}%)</span>
+          </div>
+          <div style="background:var(--surface-2);border-radius:4px;height:6px">
+            <div style="height:100%;background:${x.color};width:${pctCanal(x.val)}%;border-radius:4px"></div>
+          </div>
+        </div>`).join('')}
+    </div>` : '<div class="empty"><p>Sin datos del canal de agendamiento</p></div>';
 
   // Servicios
   document.getElementById('reporteServicios').innerHTML = servicios.length ? servicios.map((s, i) => `
@@ -186,7 +294,7 @@ function renderReportes(d) {
       <div style="flex:1"><strong style="font-size:14px">${s.nombre}</strong></div>
       <div style="text-align:right">
         <strong>${s.count} veces</strong>
-        <div style="font-size:12px;color:var(--text-muted)">$${s.precio}/c</div>
+        <div style="font-size:12px;color:var(--text-muted)">$${Number(s.precio).toLocaleString('es-MX')}/c</div>
       </div>
     </div>`).join('') : '<div class="empty"><p>Sin datos</p></div>';
 
@@ -215,13 +323,12 @@ function renderReportes(d) {
 
   // Clientes top
   const tb = document.getElementById('reporteClientes');
-  if(!clientes.length) { tb.innerHTML = `<tr><td colspan="5"><div class="empty"><p>Sin datos</p></div></td></tr>`; return; }
+  if(!clientes.length) { tb.innerHTML = `<tr><td colspan="4"><div class="empty"><p>Sin datos</p></div></td></tr>`; return; }
   tb.innerHTML = clientes.map(c => `<tr>
-    <td><strong>${c.nombre}</strong></td>
+    <td><strong>${escapeHtml(c.nombre)}</strong></td>
     <td><strong>${c.visitas}</strong></td>
-    <td style="color:var(--accent);font-weight:600">$${c.gasto.toLocaleString()}</td>
-    <td style="color:var(--text-muted)">${c.ultimoServicio || '—'}</td>
-    <td><span class="badge badge-${c.salon === 'vs' ? 'vs' : 'jb'}">${c.salon === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera'}</span></td>
+    <td style="color:var(--accent);font-weight:600">$${(c.gasto||0).toLocaleString('es-MX')}</td>
+    <td style="color:var(--text-muted)">${escapeHtml(c.ultimoServicio || '—')}</td>
   </tr>`).join('');
 }
 
@@ -247,7 +354,7 @@ cargarReportes();
   var items=[
     ['agenda','/index.html','Agenda','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'],
     ['clientes','/clientes.html','Clientes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'],
-    ['whatsapp','/whatsapp.html','WhatsApp','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'],
+    
     ['reportes','/reportes.html','Reportes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'],
     ['config','/config.html','Config','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>'],
   ];

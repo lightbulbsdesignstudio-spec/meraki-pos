@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario — Meraki Nails POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #2D2520;
+            background: linear-gradient(135deg, #FAF7F3 0%, #FDF9F5 100%);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(193, 126, 90, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #C17E5A 0%, #D99070 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 60px 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        section:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #C17E5A;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #FAF7F3;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #2D2520;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #3D3530;
+        }
+
+        .highlight {
+            background: #FFF4E6;
+            border-left: 4px solid #C17E5A;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .highlight strong {
+            color: #C17E5A;
+        }
+
+        .persona-card {
+            background: linear-gradient(135deg, #FFF9F3 0%, #FAF7F3 100%);
+            padding: 28px;
+            margin: 24px 0;
+            border-radius: 12px;
+            border-left: 5px solid #C17E5A;
+        }
+
+        .persona-card h4 {
+            font-size: 20px;
+            color: #C17E5A;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .persona-card .role {
+            font-size: 14px;
+            color: #8B7F75;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .persona-card .quote {
+            font-style: italic;
+            color: #5D5550;
+            font-size: 15px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(193, 126, 90, 0.2);
+            border-bottom: 1px solid rgba(193, 126, 90, 0.2);
+            margin: 12px 0;
+        }
+
+        .persona-card p {
+            font-size: 15px;
+            margin: 8px 0;
+        }
+
+        .journey-box {
+            background: #FAF7F3;
+            padding: 24px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border-left: 4px solid #C17E5A;
+        }
+
+        .journey-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2D2520;
+            margin-bottom: 16px;
+        }
+
+        .journey-step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .journey-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #C17E5A;
+            color: white;
+            border-radius: 50%;
+            flex-shrink: 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .step-content p {
+            margin: 0 0 8px 0;
+            font-size: 15px;
+        }
+
+        .step-content strong {
+            color: #C17E5A;
+        }
+
+        .feeling {
+            font-style: italic;
+            color: #8B7F75;
+            font-size: 14px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(193, 126, 90, 0.15);
+        }
+
+        .step {
+            background: #FAF7F3;
+            padding: 20px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid #C17E5A;
+        }
+
+        .step-number-inline {
+            display: inline-block;
+            background: #C17E5A;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            margin-right: 12px;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            display: inline;
+            margin: 0;
+        }
+
+        .faq-item {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #F0EBE5;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            font-size: 16px;
+            font-weight: 600;
+            color: #C17E5A;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            font-size: 16px;
+            color: #3D3530;
+            padding-left: 20px;
+            border-left: 2px solid #C17E5A;
+        }
+
+        .footer {
+            background: #FAF7F3;
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid #F0EBE5;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #5D5550;
+        }
+
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+        }
+
+        ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #3D3530;
+        }
+
+        .magic-moment {
+            background: linear-gradient(135deg, rgba(193, 126, 90, 0.1) 0%, rgba(217, 144, 112, 0.05) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border-left: 4px solid #D99070;
+        }
+
+        .magic-moment p {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .header {
+                padding: 40px 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 30px 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            p {
+                font-size: 15px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Manual de Usuario</h1>
+            <p>Tu sistema POS para Meraki Nails: diseñado para que Brenda administre, Moni cobre rápido, Vero vea sus números, y Andrea se sienta especial.</p>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="content">
+            <!-- SECCIÓN 1: BIENVENIDA Y PERSONAS -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Bienvenida a Meraki POS
+                </h2>
+                <p>
+                    Este manual está hecho para TI. No para tecnicismos. Está organizado alrededor de las personas que usan el sistema todos los días: Brenda (tú), Moni (tu nail tech), Vero (tu socia), y Andrea (tu clienta). Cada persona tiene su propia historia y su forma de usar el sistema.
+                </p>
+            </section>
+
+            <!-- SECCIÓN 2: CONOCE A LAS 4 PERSONAS -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Las 4 personas de tu sistema
+                </h2>
+
+                <div class="persona-card">
+                    <h4>Brenda — La Dueña</h4>
+                    <div class="role">Tú. Administratora del salón. Presencia de 10–12 horas diarias.</div>
+                    <div class="quote">"Yo solo quiero saber exactamente cuánto ganamos, si mis nail techs me están respetando los precios, y que no pierda ni un peso."</div>
+                    <p><strong>Lo que la estresa:</strong> Que Moni regale descuentos sin avisarle. Olvidar cuándo una clienta se ganó un servicio gratis. No tener claridad de si está recuperando la inversión de $300K.</p>
+                    <p><strong>Dónde está:</strong> En el salón con el celular a mano. En casa por las tardes con la computadora para revisar reportes.</p>
+                </div>
+
+                <div class="persona-card">
+                    <h4>Moni — La Nail Tech Empleada</h4>
+                    <div class="role">Nail Tech de uñas. Trabaja en silla, una clienta a la vez.</div>
+                    <div class="quote">"Yo quiero cobrar rápido, llevarme buena comisión, y que las clientas dejen buena propina."</div>
+                    <p><strong>Lo que la estresa:</strong> Un cobro raro. No entender su comisión. Tener que esperar porque Brenda está ocupada autorizando un descuento.</p>
+                    <p><strong>Dónde está:</strong> En la silla de trabajo. Usa el celular o tablet del salón cuando tiene la mano libre entre servicios.</p>
+                </div>
+
+                <div class="persona-card">
+                    <h4>Vero — La Socia Inversionista</h4>
+                    <div class="role">Invirtió dinero en Meraki. No trabaja ahí día a día.</div>
+                    <div class="quote">"Quiero saber si recupero mi lana. No quiero depender de lo que Brenda me cuente."</div>
+                    <p><strong>Lo que la estresa:</strong> Estar a ciegas. No saber si la operación es sana. Dudas sobre la rentabilidad.</p>
+                    <p><strong>Dónde está:</strong> En su casa o su otro trabajo. Entra al sistema una vez por semana para revisar números.</p>
+                </div>
+
+                <div class="persona-card">
+                    <h4>Andrea — La Clienta Leal</h4>
+                    <div class="role">Cliente de Meraki. No entra al sistema, pero su experiencia importa MUCHO.</div>
+                    <div class="quote">"Yo voy donde me tratan bien, me reconocen, y me valoran mi lealtad."</div>
+                    <p><strong>Lo que espera:</strong> Que Meraki la reconozca en la visita 5 (VIP especial). Que en la visita 10 le regalen algo bonito. Un cobro rápido y claro.</p>
+                    <p><strong>Dónde está:</strong> En la silla de Meraki. Interactúa con Brenda y Moni.</p>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: BRENDA — TU PRIMER DÍA -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                        <polyline points="13 2 13 9 20 9"></polyline>
+                    </svg>
+                    Brenda — Tu primer día: 5 minutos de setup
+                </h2>
+
+                <p>
+                    Antes de agendar la primera cita, necesitas preparar el sistema. Es rápido y fácil.
+                </p>
+
+                <div class="journey-box">
+                    <div class="journey-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <p><strong>Entra al sistema en tu navegador.</strong></p>
+                            <p style="font-family: 'Courier New', monospace; background: #FFF4E6; padding: 8px 12px; border-radius: 4px; margin: 8px 0; word-break: break-all; font-size: 14px;">https://meraki-pos.vercel.app</p>
+                            <p>Usa usuario <strong>brenda</strong> y contraseña <strong>meraki2026</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <p><strong>Ve a Configuración (en el menú izquierdo).</strong></p>
+                            <p>Aquí es donde personalizas todo.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <p><strong>Cambia los nombres de tus nail techs.</strong> Verás "Nail Tech 2", "Nail Tech 3", "Nail Tech 4". Reemplázalos por sus nombres reales (ej: Moni, Daniela, Lupita).</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <p><strong>Revisa servicios y precios.</strong> ¿Son los correctos? ¿Manicure gel está en $250? ¿Pedicure en $200? Ajusta lo que necesites.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <p><strong>Revisa las comisiones.</strong> Por defecto está en 40% para todas. Si todas tienen 40%, déjalo. Si Moni gana 45% y Lupita 35%, ajusta aquí.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <p><strong>Listo.</strong> Vuelve a Agenda. Agendar es automático desde aquí.</p>
+                            <div class="feeling">Lo que se siente: "Uf, qué fácil. En 5 minutos ya está todo listo para trabajar."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <strong>Pro tip:</strong> En tu celular, una vez dentro del sistema, toca el botón "compartir" (ícono de cuadro con flecha) y elige "Agregar a pantalla de inicio". Así aparecerá un ícono en tu inicio y entras en 1 tap, sin escribir la dirección cada vez.
+                </div>
+            </section>
+
+            <!-- SECCIÓN 4: BRENDA — UN DÍA NORMAL EN EL SALÓN -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Brenda — Cómo es un día normal
+                </h2>
+
+                <h3>Mañana: revisar la agenda</h3>
+                <p>
+                    Cuando llegas al salón, abre Meraki. Tocas "Agenda" y ves todas las citas del día: quién llega a qué hora, con quién (Moni, Lupita, etc.), y qué servicio se hace. Si una clienta no aparece, tienes claro que hay un espacio libre.
+                </p>
+
+                <h3>Durante el día: aprobar descuentos</h3>
+                <p>
+                    Moni atiende a una clienta y le pregunta si quiere descuento. Moni abre Meraki y toca el botón "Solicitar descuento a Brenda". Tú lo ves en tu pantalla, tomas la decisión rápido, y Moni puede cobrar ya.
+                </p>
+                <p>
+                    Tú controlas los descuentos. Moni no regala nada sin tu visto bueno. Punto.
+                </p>
+
+                <h3>Tarde: clienta VIP especial</h3>
+                <p>
+                    Andrea llega y es su visita número 5. El sistema te muestra una estrella dorada. Tú sabes que Andrea es VIP. Tal vez la recibes con un café especial, una frase cálida. Ella se siente valorada.
+                </p>
+
+                <h3>Cierre del día: ver reportes</h3>
+                <p>
+                    Antes de cerrar el salón (o en casa después), tocas "Reportes". Ves:
+                </p>
+                <ul>
+                    <li>Cuánto ganaste hoy (ej: $3,500)</li>
+                    <li>Qué servicios se vendieron más</li>
+                    <li>Cuánto debe pagarse en comisiones</li>
+                    <li>De dónde vinieron tus clientas (salón, Instagram, referidas, etc.)</li>
+                </ul>
+
+                <p>
+                    Si ves que 80% de tus clientas vienen por Instagram, sabes que Instagram es tu mejor canal. Inviertes ahí.
+                </p>
+
+                <div class="feeling">Lo que se siente: "Controlo completamente el negocio. Sé exactamente cuánto gano, quién se lleva qué, y de dónde vienen mis clientas. Eso me da paz."</div>
+            </section>
+
+            <!-- SECCIÓN 5: MONI — EL FLUJO DE UNA CITA -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Moni — Tu flujo perfecto de cita en cita
+                </h2>
+
+                <div class="journey-box">
+                    <div class="journey-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <p><strong>Llega la clienta.</strong> Brenda ya agendó la cita en Meraki, así que tú solo recíbela. Ella se sienta y tú empiezas a trabajar.</p>
+                            <div class="feeling">Lo que se siente: "Nada de anotaciones, nada de confusión. Todo está listo."</div>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <p><strong>Trabajas en las uñas.</strong> Una vez, dos veces... mientras trabajas, tienes la mano ocupada. Pero cuando terminas y tienes un segundo, agarras el celular o tablet del salón.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <p><strong>Cobrar es super simple.</strong> En la Agenda, tocas la cita. Toca el botón grande que dice "Cobrar". Se abre la pantalla de cobro.</p>
+                            <p style="margin-top: 12px;"><strong>Elige el método:</strong> efectivo, tarjeta, o SPEI (transferencia).</p>
+                            <ul style="margin-top: 8px;">
+                                <li><strong>Efectivo:</strong> La clienta te paga en la mano. Tú confirmas en el sistema. Listo.</li>
+                                <li><strong>Tarjeta:</strong> Ella pasa la tarjeta, el sistema te dice si pasó o no. Tú confirmas.</li>
+                                <li><strong>SPEI:</strong> La clienta abre su app de banco, tú le dices el número o le muestras un código QR. Ella transfiere. Tú esperas 10-15 segundos y el dinero llega automáticamente.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <p><strong>Agrega propina y extras (si aplica).</strong> En la pantalla de cobro, hay un campo que dice "Propina". La clienta te dice si quiere dejar algo. Si compró un producto (brillo, lija, etc.), toca "Agregar extra" y agrega el precio.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <p><strong>Si la clienta pide descuento...</strong> Antes de cobrar, si ella pide "¿me haces descuento?", tú toca el botón "Solicitar descuento a Brenda". Brenda verá la solicitud en su pantalla en tiempo real. Ella decide rápido. Si acepta, tú cobras el monto reducido. Si dice no, cobras el precio normal.</p>
+                            <p style="margin-top: 8px;"><strong>Importante:</strong> Tú NUNCA le haces descuento de tu bolsillo. Todo pasa por Brenda.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <p><strong>Confirma el cobro.</strong> Toca el botón "Confirmar pago" o "Cobrar" (según la pantalla). Listo. Tu comisión se calcula automáticamente según lo que configuró Brenda (ej: 40%).</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">7</div>
+                        <div class="step-content">
+                            <p><strong>Momento mágico (si aplica).</strong> Si esta clienta acaba de llegar a su visita 10, el sistema te muestra un mensaje grande: "¡Andrea se ganó un servicio gratis!" Tú le dices a Brenda, y ellas deciden cuándo regalárselo.</p>
+                            <div class="feeling">Lo que se siente: "Cobro super rápido, todo transparente, y mi comisión se calcula sin que tenga que pensar. Y si alguien llega a la visita 10, es un momento especial para toda el salón."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <strong>Velocidad:</strong> Todo esto (cobro completo + propina + extras) toma menos de 1 minuto. Es tan rápido que la clienta casi ni espera.
+                </div>
+            </section>
+
+            <!-- SECCIÓN 6: BRENDA — CUANDO MONI SOLICITA DESCUENTO -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Brenda — Cómo funciona la autorización de descuentos
+                </h2>
+
+                <p>
+                    Moni está en la silla, la clienta pregunta por descuento. Moni no puede decidir sola. Abre Meraki y toca "Solicitar descuento a Brenda". En tu pantalla aparece la solicitud:
+                </p>
+
+                <div class="magic-moment">
+                    <p><strong>Notificación en tu Meraki:</strong> "Moni solicita 15% descuento para Andrea. Servicio: Gel $350 → $297. ¿Aceptas?"</p>
+                </div>
+
+                <p>
+                    Tú tomas 5 segundos para decidir. ¿La clienta es leal (visita 20)? Acepta. ¿Es primera vez y pide descuento sin razón? Rechaza.
+                </p>
+
+                <p>
+                    Tocas "Aceptar" o "Rechazar". Moni lo ve inmediatamente en su pantalla y cobra según lo que tú decidiste.
+                </p>
+
+                <p>
+                    <strong>Resultado:</strong> Tú controlas TODOS los descuentos. Moni no regala nada sin tu aprobación. Tu margen está seguro.
+                </p>
+
+                <div class="feeling">Lo que se siente: "Estoy en control. Nadie regala sin que yo lo sepa. Mi negocio está blindado."</div>
+            </section>
+
+            <!-- SECCIÓN 7: VERO — TU PANEL DE SOCIA -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Vero — Tu panel de socia (cada semana)
+                </h2>
+
+                <p>
+                    Vero invirtió dinero en Meraki. Ella no trabaja ahí, pero necesita saber si va a recuperar su lana. Una vez por semana, ella entra al sistema con su propia cuenta (Brenda le da el usuario y contraseña).
+                </p>
+
+                <div class="journey-box">
+                    <div class="journey-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <p><strong>Entra a su panel "Socios".</strong> Solo ve dos números importantes:</p>
+                            <ul style="margin-top: 8px;">
+                                <li><strong>Inversión inicial:</strong> Ej: $300,000 MXN</li>
+                                <li><strong>Recuperado hasta hoy:</strong> Ej: $45,230 MXN</li>
+                                <li><strong>Falta para recuperar:</strong> Ej: $254,770 MXN</li>
+                                <li><strong>Meses para recuperar (estimado):</strong> Ej: 18-20 meses</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <p><strong>También ve ganancias mensuales.</strong> Un gráfico que muestra: mes 1 ganaron $X, mes 2 ganaron $Y, mes 3 ganaron $Z. Ella ve la tendencia.</p>
+                        </div>
+                    </div>
+
+                    <div class="journey-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <p><strong>Eso es todo.</strong> Vero no ve transacción por transacción. Solo ve lo que le importa: dinero recuperado y proyección de cuándo recupera TODO.</p>
+                            <div class="feeling">Lo que se siente: "Ya no tengo que molestar a Brenda preguntando. Veo los números en tiempo real. Sé exactamente cómo va el negocio. Eso me tranquiliza."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight">
+                    <strong>Transparencia total.</strong> Vero deja de estar a ciegas. Ve números reales. Brenda no tiene que gastarse 20 minutos en explicar "cómo va el salón".
+                </div>
+            </section>
+
+            <!-- SECCIÓN 8: ANDREA — LO QUE VIVE LA CLIENTA (aunque ella no use el sistema) -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    Andrea — Lo que ella vive (aunque no toque el sistema)
+                </h2>
+
+                <p>
+                    Andrea es clienta de Meraki. Ella no entra al sistema, pero cada visita suya cuenta. El sistema está diseñado para que ella se sienta especial.
+                </p>
+
+                <h3>Visita 1-4: Clienta nueva</h3>
+                <p>
+                    Andrea llega por primera vez (referida por una amiga, vio Instagram, lo que sea). Moni la recibe, la atiende. Cuando cobra, Meraki registra que Andrea acaba de llegar.
+                </p>
+
+                <h3>Visita 5: Andrea se convierte en VIP</h3>
+                <div class="magic-moment">
+                    <p>
+                        Andrea llega por quinta vez. Cuando Brenda cobra esa cita, el sistema brilla: "⭐ Andrea ahora es VIP". Brenda lo ve. Moni lo ve. Y Brenda hace algo especial: tal vez le dice "Andrea, eres VIP en Meraki ahora. De aquí en adelante, tienes prioridad en agenda", o le regala un pequeño obsequio.
+                    </p>
+                    <p style="margin-top: 12px;">
+                        <strong>Lo que siente Andrea:</strong> "Uau, ellas me reconocen. Vengo seguido y me valoran. Voy a volver."
+                    </p>
+                </div>
+
+                <h3>Visita 10: El primer regalo</h3>
+                <div class="magic-moment">
+                    <p>
+                        Andrea llega por décima vez. Esta es una visita histórica. Cuando Moni cobra, el sistema hace ring ring: 💎 "¡ANDREA SE GANÓ UN SERVICIO GRATIS!"
+                    </p>
+                    <p style="margin-top: 12px;">
+                        Brenda anuncia: "Andrea, ¡ya llegaste a 10 visitas! Hoy el servicio corre por nuestra cuenta. ¡Felicidades!" Y eso no es un descuento a la fuerza, es un REGALO que ella se ganó por lealtad.
+                    </p>
+                    <p style="margin-top: 12px;">
+                        <strong>Lo que siente Andrea:</strong> "No puedo creer que me regalen un servicio. Y es porque vengo seguido. Meraki me cuida. Voy a venir SIEMPRE."
+                    </p>
+                </div>
+
+                <h3>Visita 20, 30, etc.: VIP permanente</h3>
+                <p>
+                    Andrea sigue visitando. Cada 10 visitas se gana otro servicio gratis. Ella ya es amiga de Brenda y Moni. Es la clienta que todos quieren retener porque sabe que Meraki la valora.
+                </p>
+
+                <h3>El cobro SPEI: experiencia rápida</h3>
+                <p>
+                    Andrea termina, Moni abre el cobro en Meraki. En vez de cobrar en efectivo (que toma tiempo, cambio, etc.), le dice: "¿Te paso por SPEI?" Andrea abre su app de banco, escanea el código QR de Moni, transfiere en 5 segundos. Breve, elegante, profesional.
+                </p>
+
+                <div class="feeling">
+                    <strong>Lo que siente Andrea cada vez que va a Meraki:</strong> "Estas nail techs me conocen por nombre, me reconocen cuando llego, saben si es mi visita 5 o mi visita 20, me regalan servicios porque soy leal, y el cobro es rápido. No es un salón cualquiera. Meraki es MI salón."
+                </div>
+            </section>
+
+            <!-- SECCIÓN 9: LEALTAD: EL PROGRAMA AUTOMÁTICO -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                    El programa de lealtad: automático y poderoso
+                </h2>
+
+                <p>
+                    Tu sistema cuenta visitas automáticamente. Tú no haces nada. Solo agrega clientes, cobra citas, y el sistema cuida el resto.
+                </p>
+
+                <div class="magic-moment">
+                    <p><strong>⭐ Visita 5:</strong> La clienta pasa a "VIP". Aparece una estrella en su perfil.</p>
+                    <p><strong>💎 Visita 10:</strong> Primer servicio gratis. El sistema te avisa cuando cobres esa cita.</p>
+                    <p><strong>💎 Visita 20:</strong> Segundo servicio gratis.</p>
+                    <p><strong>💎 Visita 30:</strong> Tercer servicio gratis.</p>
+                    <p style="margin-top: 12px;"><strong>Y así sigue cada 10 visitas:</strong> otro regalo automático. El sistema cuenta sin que tú tengas que llevar un cuaderno.</p>
+                </div>
+
+                <h3>Cómo usas esto en la práctica</h3>
+                <p>
+                    Cuando Meraki te avisa "Andrea se ganó un servicio gratis" (visita 10, 20, 30...), tú anotalo o recuérdalo. La próxima vez que Andrea venga, en lugar de cobrarle ese servicio, lo regalas. Selecciona "Método de pago: Gratis" en el cobro y listo.
+                </p>
+
+                <p>
+                    En la pantalla "Clientes", puedes ver cada clienta, cuántas visitas lleva, y si se ganó algo. Así nunca olvidas.
+                </p>
+
+                <div class="highlight">
+                    <strong>Impacto estratégico:</strong> Este programa es oro puro para retener. Las clientas saben que cada 10 visitas se ganan algo gratis. Eso las trae de vuelta automáticamente. Es lealtad a través de generosidad.
+                </div>
+            </section>
+
+            <!-- SECCIÓN 10: REPORTES PARA ENTENDER EL NEGOCIO -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="2" x2="12" y2="22"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Reportes: los números que importan
+                </h2>
+
+                <p>
+                    Cuando tocas "Reportes", ves gráficos y números que te cuentan la historia de tu negocio.
+                </p>
+
+                <h3>Ingresos totales</h3>
+                <p>
+                    Cuánto ganaste hoy, esta semana, este mes. Un gráfico de barras o líneas que sube y baja. Así ves si un día fue mejor que otro, o si el mes es bueno.
+                </p>
+
+                <h3>Servicios más populares</h3>
+                <p>
+                    ¿Cuál es tu "cash cow"? ¿La gente viene más por gel ($350) o por pedicure clásico ($200)? Cuando sepas qué vende más, puedes:
+                </p>
+                <ul>
+                    <li>Promocionar eso en Instagram</li>
+                    <li>Asignar a Moni esos servicios (si es su especialidad)</li>
+                    <li>Elevar el precio un poquito (si ves que siempre vende)</li>
+                </ul>
+
+                <h3>Comisiones por nail tech</h3>
+                <p>
+                    Cuánto debe pagarse en total a Moni, Daniela, Lupita, etc., basado en sus comisiones (40%, 45%, etc.) y en lo que vendieron. El sistema calcula automáticamente. Tú solo lo ves y pagas.
+                </p>
+
+                <h3>Canales de captación (oro puro)</h3>
+                <p>
+                    De dónde vinieron tus clientas. Un pie chart que muestra:
+                </p>
+                <ul>
+                    <li>50% por salón (clientas que pasan caminando)</li>
+                    <li>30% por Instagram (las que vieron posts)</li>
+                    <li>15% por referidas (amigas de amigas)</li>
+                    <li>5% por Google/otros</li>
+                </ul>
+
+                <p>
+                    <strong>Cómo lo usas:</strong> Si 50% viene por salón, está bien: los peatones son confiables. Si 30% viene por Instagram, INVIERTE en Instagram (más posts, mejores fotos, storiescon antes/después). Si casi nadie viene por Facebook, no pierdas tiempo ahí.
+                </p>
+
+                <div class="highlight">
+                    <strong>Dato estratégico:</strong> Los canales de captación te dicen exactamente dónde invertir tu energía de marketing. Eso te evita gastar tiempo en redes que no funcionan.
+                </div>
+            </section>
+
+            <!-- SECCIÓN 11: PREGUNTAS FRECUENTES -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                    Preguntas frecuentes
+                </h2>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Qué pasa si cierro por un día?</p>
+                    <div class="faq-answer">
+                        Nada. Tu sistema sigue en la nube. Cuando abras de nuevo, selecciona la fecha correcta en Agenda y sigue trabajando. El sistema es flexible con las fechas.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Se pierden los datos si se me cae el celular o se daña?</p>
+                    <div class="faq-answer">
+                        No. Todo está guardado en la nube, no en tu teléfono. Si se te cae, reparas la pantalla, descargas un navegador de nuevo, entras a meraki-pos.vercel.app, y todo está exactamente donde lo dejaste. Es como tener un backup automático en un banco.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Puedo entrar desde mi computadora o solo desde celular?</p>
+                    <div class="faq-answer">
+                        Desde ambos. Es un sitio web. Abre https://meraki-pos.vercel.app en cualquier navegador, en cualquier dispositivo (celular, tablet, computadora). Tu sesión sincroniza automáticamente, así que si agendes una cita desde la computadora, Moni la ve en el celular del salón.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Cuánto tiempo toma aprender a usar Meraki?</p>
+                    <div class="faq-answer">
+                        Los primeros 5 minutos es setup (cambiar nombres, revisar precios). Después, el primer día de trabajo, tal vez necesitas 10 minutos para acostumbrarte. Para la tercera cita, es automatismo puro. Es más fácil que WhatsApp.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Qué pasa si agendo mal una cita? ¿Puedo cancelarla?</p>
+                    <div class="faq-answer">
+                        Sí. En la Agenda, toca la cita y habrá un botón "Eliminar" o "Cancelar". Desaparece de tu calendario. Si ya la cobraste y te diste cuenta después, contacta a Netie (la creadora) para que corrija el registro.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Cómo agrego una clienta nueva en el sistema?</p>
+                    <div class="faq-answer">
+                        Cuando tocas "+ Nueva cita" en Agenda y buscas el nombre de la clienta, si no existe, aparecerá la opción "Agregar cliente nuevo". Llena: nombre, teléfono, colonia (donde vive), y canal de origen (cómo la conociste: salón, Instagram, Facebook, referida, Google, etc.). Confirma. Ya está en tu base de datos. La próxima vez que venga, la buscas por nombre y listo.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Puedo cambiar los precios de los servicios después?</p>
+                    <div class="faq-answer">
+                        Sí. Ve a Configuración, toca el servicio, cambia el precio. Se aplica automáticamente a todas las citas nuevas. Las citas pasadas quedan con su precio original (no se afectan). Así tu historial de ingresos es honesto.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Ves todo el dinero que entra, o el sistema se queda con una parte?</p>
+                    <div class="faq-answer">
+                        Todo es tuyo. El sistema es una herramienta que usa para administrar. No toma comisión ni se queda con dinero. Brenda decide cuánto gana cada nail tech según su comisión, y el resto es para Meraki (dueña) y socios.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-question">¿Qué pasa si una clienta pide cambiar su método de pago (de efectivo a SPEI) después de cobrar?</p>
+                    <div class="faq-answer">
+                        Puedes cancelar esa transacción (si la cobraste hace poco) y cobrar de nuevo con el método correcto. Si pasó mucho tiempo, contacta a Netie. El sistema mantiene un registro de todas las transacciones, así que no hay confusión.
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 12: SOPORTE Y CIERRE -->
+            <section>
+                <h2>
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Si algo no funciona o tienes dudas
+                </h2>
+
+                <p>
+                    Si algo se ve raro, no puedes entrar, o tienes una pregunta que no está en este manual:
+                </p>
+
+                <ul>
+                    <li><strong>Contacta a Netie de Lightbulbs Design Studio.</strong> Ella diseñó e instaló tu sistema y puede resolver cualquier cosa.</li>
+                    <li><strong>Envía un mensaje de WhatsApp o correo.</strong> Describe qué pasó (ej: "No puedo ver la cita de hoy en la Agenda" o "El cobro de SPEI no apareció").</li>
+                    <li><strong>Si se apagó internet:</strong> Tu sistema se queda ahí, esperando. Cuando vuelva la conexión, sincroniza automáticamente. No pierdas datos.</li>
+                </ul>
+
+                <div class="highlight">
+                    <strong>Última cosa:</strong> Este manual te prepara para el 95% de lo que vas a hacer. Los primeros 2-3 días, tómate tiempo, experimenta sin miedo. No hay nada que puedas romper. Es un sistema sencillo y resistente. A la tercera cita, será automático puro.
+                </div>
+            </section>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>
+                <strong>Meraki Nails POS</strong><br>
+                Diseñado para Brenda, Moni, Vero, y Andrea. Para un salón que funciona sin complicaciones.
+            </p>
+            <p style="margin-top: 12px; color: #8B7F75;">
+                Última actualización: Abril 2026<br>
+                Creado por Lightbulbs Design Studio
+            </p>
+        </div>
+    </div>
+</body>
+</html>

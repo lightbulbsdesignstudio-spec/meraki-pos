@@ -1,8 +1,11 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
+import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
+  const blocked = await requireAuth(req, res);
+  if (blocked) return;
 
   try {
     if (req.method === 'GET') {
@@ -21,7 +24,10 @@ export default async function handler(req, res) {
         nombre: body.nombre,
         tel: body.tel || '',
         email: body.email || '',
-        salonFrecuente: body.salonFrecuente || '',
+        colonia: body.colonia || '',        // geospatial/marketing
+        cp: body.cp || '',                  // geospatial/marketing
+        canalOrigen: body.canalOrigen || 'salon', // salon/instagram/facebook/referido/google
+        referidoPor: body.referidoPor || '',       // clienteId quien refirió
         notas: body.notas || '',
         creadoEn: new Date().toISOString(),
       };
@@ -33,7 +39,17 @@ export default async function handler(req, res) {
     if (req.method === 'PUT') {
       const existing = await redis.get(keys.cliente(body.id));
       if (!existing) return res.status(404).json({ ok: false, error: 'Cliente no encontrado' });
-      const updated = { ...existing, nombre: body.nombre, tel: body.tel || '', email: body.email || '', salonFrecuente: body.salonFrecuente || '', notas: body.notas || '' };
+      const updated = {
+        ...existing,
+        nombre: body.nombre,
+        tel: body.tel || '',
+        email: body.email || '',
+        colonia: body.colonia || existing.colonia || '',
+        cp: body.cp || existing.cp || '',
+        canalOrigen: body.canalOrigen || existing.canalOrigen || 'salon',
+        referidoPor: body.referidoPor || existing.referidoPor || '',
+        notas: body.notas || '',
+      };
       await redis.set(keys.cliente(body.id), updated);
       return res.json({ ok: true, data: updated });
     }
@@ -50,4 +66,3 @@ export default async function handler(req, res) {
     res.status(500).json({ ok: false, error: e.message });
   }
 }
-

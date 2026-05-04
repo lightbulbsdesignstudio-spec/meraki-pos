@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servicios — Meraki Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/assets/styles.css?v=5">
+  <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}}</style>
+  <script src="/assets/session.js" defer></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><div class="brand">MERAKI NAILS</div><div class="sub">Sistema de gestión</div></div>
+  <div class="nav-links">
+    <a href="/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</a>
+    <a href="/clientes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes</a>
+    <a href="/servicios.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Servicios</a>
+    <a href="/reportes.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <a data-rol="admin,socio" href="/socios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Socios</a>
+    <a data-rol="admin" href="/config.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>Configuración</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Servicios</h1>
+    <div class="topbar-actions">
+      <input type="text" id="busqueda" placeholder="Buscar servicio..." oninput="renderServicios()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;min-width:240px">
+      <select id="filtroCat" onchange="renderServicios()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13.5px">
+        <option value="">Todas las categorías</option>
+      </select>
+      <button class="btn btn-primary" data-rol="admin" onclick="abrirModalServicio()">+ Agregar servicio</button>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <span style="font-weight:600">Catálogo de servicios</span>
+        <span style="font-size:12.5px;color:var(--text-muted)" id="resumen"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Servicio</th><th>Categoría</th><th>Duración</th><th>Precio</th><th data-rol="admin">Acciones</th>
+          </tr></thead>
+          <tbody id="tablaServicios"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SERVICIO -->
+<div class="modal-backdrop" id="modalServicio">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="tituloServicio">Nuevo servicio</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalServicio')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre del servicio</label><input id="svcNombre" placeholder="Ej: Manicura gel"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Precio ($)</label><input id="svcPrecio" type="number" placeholder="350"></div>
+        <div class="form-group"><label>Duración (minutos)</label><input id="svcDuracion" type="number" placeholder="60"></div>
+      </div>
+      <div class="form-group">
+        <label>Categoría</label>
+        <select id="svcCategoria">
+          <option value="Manicura">Manicura</option>
+          <option value="Pedicura">Pedicura</option>
+          <option value="Gel">Gel</option>
+          <option value="Esmalte">Esmalte</option>
+          <option value="Refuerzo">Refuerzo</option>
+          <option value="Extensión">Extensión</option>
+          <option value="Retiro">Retiro</option>
+          <option value="Paquete">Paquete</option>
+          <option value="Arte">Arte</option>
+          <option value="Extra">Extra</option>
+          <option value="Depilación">Depilación</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Descripción (opcional)</label><textarea id="svcDesc" placeholder="Descripción del servicio..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalServicio')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarServicio()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+let servicios = [], editServicio = null;
+
+async function init() {
+  await cargarServicios();
+}
+
+async function cargarServicios() {
+  const r = await fetch('/api/config?tipo=servicios', { credentials:'same-origin' });
+  const d = await r.json();
+  servicios = d.data || [];
+  // Poblar filtro de categorías
+  const cats = [...new Set(servicios.map(s => s.categoria).filter(Boolean))].sort();
+  const sel = document.getElementById('filtroCat');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  sel.value = cur;
+  renderServicios();
+}
+
+function renderServicios() {
+  const q = document.getElementById('busqueda').value.toLowerCase().trim();
+  const cat = document.getElementById('filtroCat').value;
+  let filtrados = servicios.filter(s => {
+    if (cat && s.categoria !== cat) return false;
+    if (q && !((s.nombre||'').toLowerCase().includes(q) || (s.desc||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  document.getElementById('resumen').textContent = `${filtrados.length} de ${servicios.length} servicios`;
+
+  const tb = document.getElementById('tablaServicios');
+  const isAdmin = window.currentUser?.rol === 'admin';
+  const colspan = isAdmin ? 5 : 4;
+  if (!filtrados.length) {
+    tb.innerHTML = `<tr><td colspan="${colspan}"><div class="empty"><h3>Sin resultados</h3><p>${servicios.length ? 'Ajusta el filtro o la búsqueda.' : 'Agrega tu primer servicio.'}</p></div></td></tr>`;
+    return;
+  }
+  tb.innerHTML = filtrados.map(s => `<tr>
+    <td><strong>${escapeHtml(s.nombre)}</strong>${s.desc ? `<br><span style="color:var(--text-muted);font-size:12px;line-height:1.4">${escapeHtml(s.desc)}</span>` : ''}</td>
+    <td><span class="badge badge-accent">${escapeHtml(s.categoria || '—')}</span></td>
+    <td>${s.duracion} min</td>
+    <td style="font-weight:700;color:var(--accent)">$${(s.precio||0).toLocaleString('es-MX')}</td>
+    ${isAdmin ? `<td>
+      <button class="btn btn-ghost btn-sm" onclick='editarServicio(${JSON.stringify(s).replace(/'/g,"&#39;")})'>Editar</button>
+      <button class="btn btn-ghost btn-sm" onclick="eliminarServicio('${s.id}')" style="color:var(--danger)">Eliminar</button>
+    </td>` : ''}
+  </tr>`).join('');
+}
+
+function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+function abrirModalServicio(data = {}) {
+  editServicio = data.id || null;
+  document.getElementById('tituloServicio').textContent = editServicio ? 'Editar servicio' : 'Nuevo servicio';
+  document.getElementById('svcNombre').value = data.nombre || '';
+  document.getElementById('svcPrecio').value = data.precio || '';
+  document.getElementById('svcDuracion').value = data.duracion || '';
+  document.getElementById('svcCategoria').value = data.categoria || 'Manicura';
+  document.getElementById('svcDesc').value = data.desc || '';
+  document.getElementById('modalServicio').classList.add('open');
+}
+function editarServicio(s) { abrirModalServicio(s); }
+async function guardarServicio() {
+  const nombre = document.getElementById('svcNombre').value.trim();
+  const precio = parseFloat(document.getElementById('svcPrecio').value);
+  const duracion = parseInt(document.getElementById('svcDuracion').value);
+  if (!nombre || !precio || !duracion) { toast('Completa todos los campos', 'error'); return; }
+  const payload = { id: editServicio, nombre, precio, duracion, categoria: document.getElementById('svcCategoria').value, desc: document.getElementById('svcDesc').value };
+  const r = await fetch('/api/config', {
+    method: editServicio ? 'PUT' : 'POST',
+    headers: {'Content-Type':'application/json'},
+    credentials: 'same-origin',
+    body: JSON.stringify({tipo:'servicio', ...payload})
+  });
+  const d = await r.json();
+  if (d.ok) { toast('Guardado', 'success'); cerrarModal('modalServicio'); await cargarServicios(); }
+  else toast(d.error || 'Error', 'error');
+}
+async function eliminarServicio(id) {
+  if (!confirm('¿Eliminar este servicio del catálogo?')) return;
+  const r = await fetch('/api/config', {
+    method: 'DELETE',
+    headers: {'Content-Type':'application/json'},
+    credentials: 'same-origin',
+    body: JSON.stringify({tipo:'servicio', id})
+  });
+  const d = await r.json();
+  if (d.ok) { toast('Eliminado', 'success'); await cargarServicios(); }
+  else toast(d.error || 'Error', 'error');
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+function toast(msg, type='') {
+  const div = document.createElement('div'); div.className = `toast ${type}`; div.textContent = msg;
+  document.getElementById('toasts').appendChild(div); setTimeout(() => div.remove(), 3000);
+}
+document.querySelectorAll('.modal-backdrop').forEach(b => b.addEventListener('click', e => { if(e.target===b) b.classList.remove('open'); }));
+
+window.addEventListener('session:ready', init);
+</script>
+</body>
+</html>

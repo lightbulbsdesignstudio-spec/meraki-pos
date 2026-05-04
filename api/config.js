@@ -1,8 +1,12 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
+import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
+  // Lectura: cualquier sesión autenticada. Mutaciones: solo admin.
+  const blocked = await requireAuth(req, res, req.method === 'GET' ? null : ['admin']);
+  if (blocked) return;
   const { tipo } = req.method === 'GET' ? req.query : (await parseBody(req));
 
   try {
@@ -27,7 +31,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const id = newId();
       if (body.tipo === 'tecnica') {
-        const obj = { id, nombre: body.nombre, salonId: body.salonId, tel: body.tel || '', activa: body.activa !== false, comision: Number(body.comision) || 0 };
+        const obj = { id, nombre: body.nombre, tel: body.tel || '', color: body.color || '#B5705F', activa: body.activa !== false, comision: Number(body.comision) || 0 };
         await redis.set(keys.tecnica(id), obj);
         await redis.sadd(keys.tecnicas(), id);
         return res.json({ ok: true, data: obj });
@@ -44,7 +48,7 @@ export default async function handler(req, res) {
       if (body.tipo === 'tecnica') {
         const existing = await redis.get(keys.tecnica(body.id));
         if (!existing) return res.status(404).json({ ok: false, error: 'No encontrado' });
-        const obj = { ...existing, nombre: body.nombre, salonId: body.salonId, tel: body.tel || '', activa: body.activa !== false, comision: Number(body.comision) || 0 };
+        const obj = { ...existing, nombre: body.nombre, tel: body.tel || '', color: body.color || existing.color || '#B5705F', activa: body.activa !== false, comision: Number(body.comision) || 0 };
         await redis.set(keys.tecnica(body.id), obj);
         return res.json({ ok: true, data: obj });
       }
@@ -76,4 +80,3 @@ export default async function handler(req, res) {
     res.status(500).json({ ok: false, error: e.message });
   }
 }
-

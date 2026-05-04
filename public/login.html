@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — Meraki Nails</title>
+<link rel="stylesheet" href="/assets/styles.css">
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--bg) 100%);
+    padding: 24px;
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(28px, 5vw, 48px);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px -20px rgba(24, 24, 26, 0.15), 0 4px 12px -4px rgba(24, 24, 26, 0.05);
+  }
+  .login-brand {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-brand h1 {
+    margin: 0 0 6px;
+    font-size: clamp(26px, 4vw, 32px);
+    letter-spacing: 0.02em;
+    color: var(--primary);
+  }
+  .login-brand p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .login-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .login-form input {
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.15s ease;
+  }
+  .login-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  .login-btn {
+    margin-top: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .login-btn:hover { background: var(--accent-hover); }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error {
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    text-align: center;
+    display: none;
+  }
+  .login-error.visible { display: block; }
+  .login-foot {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+</style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-brand">
+      <h1>MERAKI NAILS</h1>
+      <p>Sistema de gestión</p>
+    </div>
+    <form class="login-form" id="loginForm" autocomplete="on">
+      <div class="login-error" id="loginError"></div>
+      <label>
+        Usuario
+        <input type="text" id="username" autocomplete="username" required autofocus>
+      </label>
+      <label>
+        Contraseña
+        <input type="password" id="password" autocomplete="current-password" required>
+      </label>
+      <button class="login-btn" type="submit" id="loginBtn">Entrar</button>
+    </form>
+    <div class="login-foot">¿Olvidaste tu contraseña? Pídele a Brenda que la reinicie.</div>
+  </div>
+
+<script>
+const form = document.getElementById('loginForm');
+const errorBox = document.getElementById('loginError');
+const btn = document.getElementById('loginBtn');
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.add('visible');
+}
+function hideError() {
+  errorBox.classList.remove('visible');
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  hideError();
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  try {
+    const r = await fetch('/api/auth?action=login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+      })
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      showError(d.error || 'Error al iniciar sesión');
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+      return;
+    }
+    // Redirigir a la página solicitada o a la default según rol
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    if (next && next.startsWith('/')) {
+      location.href = next;
+    } else if (d.data.rol === 'socio') {
+      location.href = '/socios.html';
+    } else {
+      location.href = '/index.html';
+    }
+  } catch (e) {
+    showError('Error de conexión');
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+});
+
+// Si ya hay sesión, redirigir
+fetch('/api/auth?action=me', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
+  if (d.ok) {
+    if (d.data.rol === 'socio') location.href = '/socios.html';
+    else location.href = '/index.html';
+  }
+});
+</script>
+</body>
+</html>

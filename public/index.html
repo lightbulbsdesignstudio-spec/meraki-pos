@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda — N de Nails</title>
+  <title>Agenda — Meraki Nails</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/assets/styles.css?v=4">
   <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}</style>
+  <script src="/assets/session.js" defer></script>
 </head>
 <body>
 
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">
-    <div class="brand">N DE NAILS</div>
+    <div class="brand">MERAKI NAILS</div>
     <div class="sub">Sistema de gestión</div>
   </div>
   <div class="nav-links">
@@ -27,24 +28,22 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Clientes
     </a>
-    <a href="/whatsapp.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      WhatsApp IA
-    </a>
+    <a href="/servicios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Servicios</a>
+
     <a href="/reportes.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Reportes
     </a>
-    <a href="/config.html">
+    <a data-rol="admin,socio" href="/socios.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Socios
+    </a>
+    <a data-rol="admin" href="/config.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>
       Configuración
     </a>
   </div>
-  <div class="nav-salones">
-    <div class="label">Salones</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--vs)"></div>Vicente Suárez</div>
-    <div class="salon-badge"><div class="salon-dot" style="background:var(--jb)"></div>Juan de la Barrera</div>
-  </div>
+
 </nav>
 
 <!-- MAIN -->
@@ -55,8 +54,6 @@
     <div class="topbar-actions">
       <div class="cal-filter">
         <button id="filterAll" class="active-all" onclick="setFilter('all')">Todos</button>
-        <button id="filterVS" onclick="setFilter('vs')">Vicente Suárez</button>
-        <button id="filterJB" onclick="setFilter('jb')">Juan de la Barrera</button>
       </div>
       <button class="btn btn-primary" onclick="abrirModalCita()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -99,7 +96,7 @@
         <select id="citaCliente"></select>
       </div>
       <div class="form-group">
-        <label>Técnica</label>
+        <label>Nail Tech</label>
         <select id="citaTecnica" onchange="cargarServiciosDeTecnica()"></select>
       </div>
       <div class="form-group">
@@ -161,7 +158,7 @@
         <label>Método de pago</label>
         <button class="spei-hero" id="metodoSPEI" onclick="setMetodoPago('spei')">
           <div>
-            <div class="spei-label">📲 SPEI · Transferencia instantánea</div>
+            <div class="spei-label">SPEI · Transferencia instantánea</div>
             <div class="spei-sub">Canal principal · Sin comisión</div>
           </div>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -182,7 +179,7 @@
       <div id="clabeBox" class="spei-clabe-box" style="display:none">
         <div class="spei-clabe-label">CLABE interbancaria</div>
         <div class="spei-clabe-num">
-          <span id="clabeNum">646 180 1118 00000 001</span>
+          <span id="clabeNum" style="color:var(--text-muted)">Cargando…</span>
           <button class="btn btn-ghost btn-sm" onclick="copiarCLABE()" title="Copiar CLABE">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar
@@ -198,6 +195,23 @@
           <button class="btn btn-ghost btn-sm" onclick="agregarExtra()">+ Agregar</button>
         </div>
         <div id="listaExtras" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
+      </div>
+
+      <!-- Descuento (con autorización Brenda) -->
+      <div class="form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="margin:0">Descuento</label>
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalDescuento()" id="btnAplicarDescuento">+ Aplicar descuento</button>
+        </div>
+        <div id="descuentoBox" style="display:none;background:var(--accent-light);border:1px solid var(--accent-mid);border-radius:8px;padding:10px 12px;margin-top:6px;font-size:13px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+            <div>
+              <div style="font-weight:600;color:var(--accent)" id="descResumen">—</div>
+              <div style="color:var(--text-muted);font-size:12px;margin-top:2px" id="descMeta">—</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="quitarDescuento()" style="color:var(--danger)">Quitar</button>
+          </div>
+        </div>
       </div>
 
       <!-- Propina -->
@@ -222,6 +236,85 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Confirmar cobro
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL DESCUENTO (AUTORIZACIÓN WHATSAPP) ═══════════ -->
+<div class="modal-backdrop" id="modalDescuento">
+  <div class="modal" style="width:min(520px,95vw)">
+    <div class="modal-header">
+      <h3>Aplicar descuento</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalDescuento')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-muted);font-size:13.5px;margin:0 0 16px">Captura el descuento, pídele autorización a Brenda por WhatsApp y registra quién autorizó.</p>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="descTipo" onchange="recalcularDescuento()">
+            <option value="monto">Monto fijo ($)</option>
+            <option value="porcentaje">Porcentaje (%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valor</label>
+          <input id="descValor" type="number" min="0" step="0.01" placeholder="0" oninput="recalcularDescuento()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Razón del descuento</label>
+        <input id="descRazon" type="text" placeholder="Ej. cliente frecuente, error servicio anterior, paquete...">
+      </div>
+
+      <div style="background:var(--surface-2);border-radius:8px;padding:12px 14px;margin:12px 0">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-muted)">
+          <span>Subtotal sin descuento</span>
+          <span id="descSubtotal">$0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--accent);font-weight:600;margin-top:4px">
+          <span>Descuento</span>
+          <span id="descMonto">- $0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+          <span>Total final</span>
+          <span id="descTotalFinal">$0</span>
+        </div>
+      </div>
+
+      <!-- Paso autorización -->
+      <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--surface)">
+        <div style="font-weight:600;font-size:14px;margin-bottom:10px">1. Pide autorización a Brenda</div>
+        <button class="btn btn-primary" id="btnPedirAut" onclick="pedirAutorizacionWA()" style="width:100%;background:#25D366;border-color:#25D366" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.3 0-.5-.1-.1-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2 0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.4.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.1-1.3-.1-.1-.3-.2-.6-.3z"/></svg>
+          Mandar mensaje a Brenda por WhatsApp
+        </button>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center">El sistema abre WhatsApp con el mensaje listo. Brenda responde sí o no.</div>
+
+        <div style="font-weight:600;font-size:14px;margin:16px 0 10px">2. Registra la autorización</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Autorizado por</label>
+            <input id="descAutPor" type="text" placeholder="Brenda" value="Brenda">
+          </div>
+          <div class="form-group">
+            <label>¿Cómo autorizó?</label>
+            <select id="descVia">
+              <option value="whatsapp">WhatsApp</option>
+              <option value="voz">Llamada / voz</option>
+              <option value="presencial">Presencial</option>
+              <option value="pendiente">Pendiente (cobrar después)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalDescuento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="aplicarDescuento()">Aplicar descuento</button>
     </div>
   </div>
 </div>
@@ -271,17 +364,28 @@ let vistaActual = 'dia';
 let tecnicos = [], servicios = [], clientes = [], citas = [];
 let citaEditando = null, citaSeleccionada = null;
 let cobroMetodo = 'spei', cobroExtras = [];
+let cobroDescuento = null; // { monto, razon, autorizadoPor, via }
 let wlSlot = null; // { fecha, hora, tecnicaId, tecnicaNombre }
-
-const CLABE_NEGOCIO = '646180111800000001'; // reemplazar con CLABE real en producción
+let negocioCfg = { clabe:'', banco:'', titular:'', whatsappBrenda:'', nombreNegocio:'Meraki Nails' };
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 async function init() {
   document.getElementById('citaFecha').value = formatDate(fechaActual);
   document.getElementById('citaHora').value = '10:00';
-  await Promise.all([cargarTecnicas(), cargarClientes(), cargarServicios()]);
+  await Promise.all([cargarTecnicas(), cargarClientes(), cargarServicios(), cargarNegocioCfg()]);
   await cargarCitas();
   renderCalendario();
+}
+async function cargarNegocioCfg() {
+  try {
+    const r = await fetch('/api/config-negocio', { credentials:'same-origin' });
+    const d = await r.json();
+    if (d.ok) negocioCfg = d.data;
+  } catch(e) {}
+}
+function formatCLABE(c) {
+  if (!c) return '';
+  return c.replace(/(\d{4})(\d{4})(\d{4})(\d{6})/, '$1 $2 $3 $4');
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -313,9 +417,9 @@ async function cargarCitas() {
 function poblarSelectTecnicas() {
   const sel = document.getElementById('citaTecnica');
   const cur = sel.value;
-  sel.innerHTML = '<option value="">Seleccionar técnica...</option>';
+  sel.innerHTML = '<option value="">Seleccionar Nail Tech...</option>';
   tecnicos.filter(t => t.activa).forEach(t => {
-    sel.innerHTML += `<option value="${t.id}" data-salon="${t.salonId}">${t.nombre} — ${t.salonId==='vs'?'Vicente Suárez':'Juan de la Barrera'}</option>`;
+    sel.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
   });
   sel.value = cur;
 }
@@ -334,7 +438,7 @@ function poblarSelectClientes() {
 function cargarServiciosDeTecnica() {
   const svcSel = document.getElementById('citaServicio');
   svcSel.innerHTML = '<option value="">Seleccionar servicio...</option>';
-  servicios.forEach(s => { svcSel.innerHTML += `<option value="${s.id}">${s.nombre} — $${s.precio} (${s.duracion}min)</option>`; });
+  servicios.forEach(s => { svcSel.innerHTML += `<option value="${s.id}">${s.nombre} — $${Number(s.precio).toLocaleString('es-MX')} (${s.duracion}min)</option>`; });
 }
 
 // ─── Navegación ──────────────────────────────────────────────────────────────
@@ -342,8 +446,8 @@ function cambiarDia(delta) { fechaActual.setDate(fechaActual.getDate() + delta);
 function irHoy() { fechaActual = new Date(); cargarCitas().then(renderCalendario); }
 function setFilter(f) {
   filtroSalon = f;
-  ['All','VS','JB'].forEach(k => { const btn = document.getElementById('filter'+k); if(btn) btn.className = ''; });
-  document.getElementById('filter'+f.charAt(0).toUpperCase()+f.slice(1)).className = 'active-'+f;
+  const btn = document.getElementById('filterAll');
+  if (btn) btn.className = 'active-all';
   renderCalendario();
 }
 function setVista(v) {
@@ -357,13 +461,11 @@ function setVista(v) {
 function renderCalendario() {
   document.getElementById('fechaLabel').textContent = formatDateLabel(fechaActual);
   const grid = document.getElementById('calGrid');
-  let tecsFiltradas = tecnicos.filter(t => t.activa);
-  if (filtroSalon === 'vs') tecsFiltradas = tecsFiltradas.filter(t => t.salonId === 'vs');
-  if (filtroSalon === 'jb') tecsFiltradas = tecsFiltradas.filter(t => t.salonId === 'jb');
+  const tecsFiltradas = tecnicos.filter(t => t.activa);
 
   if (!tecsFiltradas.length) {
     grid.style.gridTemplateColumns = '1fr';
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">💅</div><h3>Sin técnicas configuradas</h3><p>Ve a Configuración para agregar técnicas.</p></div>`;
+    grid.innerHTML = `<div class="empty"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C9 2 7 4 7 7v10c0 2 1 3 3 3h4c2 0 3-1 3-3V7c0-3-2-5-5-5z"/></svg></div><h3>Sin Nail Techs configuradas</h3><p>Ve a Configuración para agregar Nail Techs.</p></div>`;
     return;
   }
 
@@ -371,7 +473,6 @@ function renderCalendario() {
   const horas = Array.from({length:12}, (_,i) => `${(i+9).toString().padStart(2,'0')}:00`);
 
   grid.innerHTML = tecsFiltradas.map(t => {
-    const salon = t.salonId === 'vs' ? 'vs' : 'jb';
     const citasTec = citas.filter(c => c.tecnicaId === t.id);
     const secandoEnCurso = citasTec.some(c => c.estado === 'secando');
 
@@ -381,7 +482,7 @@ function renderCalendario() {
       const chips = citasHora.map(c => {
         const cli = clientes.find(cl => cl.id === c.clienteId);
         const svc = servicios.find(s => s.id === c.servicioId);
-        const icono = c.estado === 'secando' ? '⚡' : '';
+        const icono = c.estado === 'secando' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' : '';
         return `<div class="cita-chip ${c.estado}" onclick="verCita('${c.id}')">
           <strong>${icono}${cli ? cli.nombre.split(' ')[0] : 'Cliente'}</strong><br>
           <span style="font-size:11px">${svc ? svc.nombre : ''}</span>
@@ -395,7 +496,7 @@ function renderCalendario() {
         <div class="time-label">${formatHour(hora)}</div>
         <div class="slot-content">
           ${chips}
-          ${disponibleParalelo ? `<div style="font-size:11px;color:var(--secando);padding:4px 6px;background:var(--secando-light);border-radius:5px;display:flex;align-items:center;gap:4px"><span>⚡</span><span>Paralelo</span></div>` : ''}
+          ${disponibleParalelo ? `<div style="font-size:11px;color:var(--secando);padding:4px 6px;background:var(--secando-light);border-radius:5px;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><span>Paralelo</span></div>` : ''}
           ${citasHora.length === 0 ? `<div class="slot-add" onclick="nuevaCitaEn('${formatDate(fechaActual)}','${hora}','${t.id}')">+</div>` : ''}
         </div>
         <div class="waitlist-dot" onclick="abrirWaitlist('${formatDate(fechaActual)}','${hora}','${t.id}','${t.nombre}')" title="Ver lista de espera" style="display:none" id="wl-${t.id}-${hora.replace(':','')}">⏳</div>
@@ -403,9 +504,9 @@ function renderCalendario() {
     }).join('');
 
     return `<div class="cal-column">
-      <div class="cal-col-header ${salon}" style="justify-content:space-between">
-        <span>💅 ${t.nombre}</span>
-        <span class="badge badge-${salon}" style="font-size:11px">${t.salonId==='vs'?'VS':'JB'}</span>
+      <div class="cal-col-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C9 2 7 4 7 7v10c0 2 1 3 3 3h4c2 0 3-1 3-3V7c0-3-2-5-5-5z"/><path d="M12 2v18"/></svg>
+        <span>${t.nombre}</span>
       </div>
       ${slotsHTML}
     </div>`;
@@ -431,7 +532,7 @@ function nuevaCitaEn(fecha, hora, tecnicaId) { abrirModalCita({ fecha, hora, tec
 async function guardarCita() {
   const btn = document.getElementById('btnGuardarCita');
   if (!document.getElementById('citaCliente').value) { toast('Selecciona una clienta', 'error'); return; }
-  if (!document.getElementById('citaTecnica').value) { toast('Selecciona una técnica', 'error'); return; }
+  if (!document.getElementById('citaTecnica').value) { toast('Selecciona una Nail Tech', 'error'); return; }
   if (!document.getElementById('citaServicio').value) { toast('Selecciona un servicio', 'error'); return; }
   btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
   const payload = {
@@ -443,10 +544,9 @@ async function guardarCita() {
     servicioId: document.getElementById('citaServicio').value,
     estado: document.getElementById('citaEstado').value,
     notas: document.getElementById('citaNotas').value,
-    salonId: tecnicos.find(t => t.id === document.getElementById('citaTecnica').value)?.salonId,
   };
   try {
-    const r = await fetch('/api/citas', { method: citaEditando ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const r = await fetch('/api/citas', { method: citaEditando ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, credentials: 'same-origin', body: JSON.stringify(payload) });
     const d = await r.json();
     if (d.ok) { toast(citaEditando ? 'Cita actualizada' : 'Cita guardada', 'success'); cerrarModal('modalCita'); await cargarCitas(); renderCalendario(); }
     else toast(d.error || 'Error al guardar', 'error');
@@ -461,11 +561,9 @@ function verCita(id) {
   const cli = clientes.find(cl => cl.id === c.clienteId);
   const svc = servicios.find(s => s.id === c.servicioId);
   const tec = tecnicos.find(t => t.id === c.tecnicaId);
-  const salon = c.salonId === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera';
-
   document.getElementById('detalleBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:46px;height:46px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💅</div>
+      <div style="width:46px;height:46px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C9 2 7 4 7 7v10c0 2 1 3 3 3h4c2 0 3-1 3-3V7c0-3-2-5-5-5z"/></svg></div>
       <div>
         <div style="font-weight:700;font-size:16px">${cli ? cli.nombre : 'Cliente'}</div>
         <div style="color:var(--text-muted);font-size:13px">${cli ? (cli.tel || '') : ''}</div>
@@ -474,17 +572,16 @@ function verCita(id) {
     <div class="grid-2">
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Fecha y hora</div><div style="font-weight:600">${c.fecha} · ${formatHour(c.hora)}</div></div>
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Estado</div><span class="badge badge-${c.estado==='confirmada'?'success':c.estado==='cancelada'?'danger':c.estado==='completada'?'':c.estado==='secando'?'':' warning'}">${c.estado}</span></div>
-      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Técnica</div><div style="font-weight:600">${tec ? tec.nombre : '—'}</div></div>
-      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Salón</div><div style="font-weight:600">${salon}</div></div>
+      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Nail Tech</div><div style="font-weight:600">${tec ? tec.nombre : '—'}</div></div>
       <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Servicio</div><div style="font-weight:600">${svc ? svc.nombre : '—'}</div></div>
-      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Precio base</div><div style="font-weight:700;color:var(--accent)">$${svc ? svc.precio : '—'}</div></div>
+      <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:3px">Precio base</div><div style="font-weight:700;color:var(--accent)">${svc ? '$' + Number(svc.precio).toLocaleString('es-MX') : '—'}</div></div>
     </div>
     ${c.estado === 'completada' && c.totalCobrado ? `
     <div style="background:var(--success-light);border-radius:9px;padding:12px 14px;border:1px solid rgba(55,158,122,.15)">
       <div style="font-size:12px;color:var(--success);font-weight:600;margin-bottom:4px">COBRO REGISTRADO</div>
       <div style="display:flex;justify-content:space-between">
         <span style="font-size:13px">$${c.totalCobrado.toLocaleString('es-MX')} vía ${c.metodoPago}</span>
-        ${c.propina ? `<span style="font-size:12px;color:var(--text-muted)">propina $${c.propina}</span>` : ''}
+        ${c.propina ? `<span style="font-size:12px;color:var(--text-muted)">propina $${Number(c.propina).toLocaleString('es-MX')}</span>` : ''}
       </div>
     </div>` : ''}
     ${c.notas ? `<div style="background:var(--surface-2);padding:11px 13px;border-radius:8px;font-size:13.5px;color:var(--text)">${c.notas}</div>` : ''}`;
@@ -495,7 +592,7 @@ function verCita(id) {
   if (estadosActivos.includes(c.estado)) {
     footer.innerHTML = `
       <button class="btn btn-danger btn-sm" onclick="cambiarEstadoCita('cancelada')">Cancelar</button>
-      ${c.estado !== 'secando' ? `<button class="btn btn-ghost btn-sm" style="color:var(--secando)" onclick="cambiarEstadoCita('secando')">⚡ Iniciar secado</button>` : ''}
+      ${c.estado !== 'secando' ? `<button class="btn btn-ghost btn-sm" style="color:var(--secando)" onclick="cambiarEstadoCita('secando')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Iniciar secado</button>` : ''}
       <button class="btn btn-success btn-sm" onclick="abrirCobro()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Cobrar
@@ -512,10 +609,10 @@ function verCita(id) {
 
 async function cambiarEstadoCita(nuevoEstado) {
   if (!citaSeleccionada) return;
-  const r = await fetch('/api/citas', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...citaSeleccionada, estado: nuevoEstado}) });
+  const r = await fetch('/api/citas', { method:'PUT', headers:{'Content-Type':'application/json'}, credentials: 'same-origin', body: JSON.stringify({...citaSeleccionada, estado: nuevoEstado}) });
   const d = await r.json();
   if (d.ok) {
-    const labels = { cancelada:'Cita cancelada', secando:'⚡ Secado iniciado — slot disponible para cita paralela' };
+    const labels = { cancelada:'Cita cancelada', secando:'Secado iniciado — slot disponible para cita paralela' };
     toast(labels[nuevoEstado] || 'Actualizado', nuevoEstado === 'cancelada' ? 'error' : 'success');
     cerrarModal('modalDetalle');
     await cargarCitas(); renderCalendario();
@@ -527,9 +624,8 @@ function enviarRecordatorio() {
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
   const svc = servicios.find(s => s.id === citaSeleccionada.servicioId);
   const tec = tecnicos.find(t => t.id === citaSeleccionada.tecnicaId);
-  const salon = citaSeleccionada.salonId === 'vs' ? 'Vicente Suárez' : 'Juan de la Barrera';
   if (!cli?.tel) { toast('Esta clienta no tiene teléfono registrado', 'error'); return; }
-  const msg = encodeURIComponent(`Hola ${cli.nombre.split(' ')[0]}! 💅 Te recuerdo tu cita mañana a las ${formatHour(citaSeleccionada.hora)} con ${tec?.nombre} en ${salon} para ${svc?.nombre}. ¿Confirmas? ✨`);
+  const msg = encodeURIComponent(`Hola ${cli.nombre.split(' ')[0]}, te recuerdo tu cita mañana a las ${formatHour(citaSeleccionada.hora)} con ${tec?.nombre} para ${svc?.nombre}. ¿Confirmas? — Meraki Nails`);
   window.open(`https://wa.me/52${cli.tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
 
@@ -540,11 +636,15 @@ function abrirCobro() {
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
   cobroMetodo = 'spei';
   cobroExtras = [];
+  cobroDescuento = null;
   document.getElementById('cobroTitulo').textContent = `Cobro — ${cli ? cli.nombre.split(' ')[0] : 'Cliente'}`;
   document.getElementById('cobroSvcNombre').textContent = svc ? svc.nombre : 'Servicio';
-  document.getElementById('cobroSvcPrecio').textContent = `$${svc ? svc.precio : 0}`;
+  document.getElementById('cobroSvcPrecio').textContent = svc ? '$' + Number(svc.precio).toLocaleString('es-MX') : '$0';
   document.getElementById('cobroPropina').value = '';
   document.getElementById('listaExtras').innerHTML = '';
+  document.getElementById('descuentoBox').style.display = 'none';
+  document.getElementById('btnAplicarDescuento').style.display = '';
+  refrescarCLABEUI();
   // SPEI seleccionado por defecto
   setMetodoPago('spei');
   recalcularTotal();
@@ -568,7 +668,23 @@ function setMetodoPago(metodo) {
 }
 
 function copiarCLABE() {
-  navigator.clipboard.writeText(CLABE_NEGOCIO).then(() => toast('CLABE copiada', 'success'));
+  if (!negocioCfg.clabe) { toast('Brenda no ha cargado la CLABE en Configuración', 'error'); return; }
+  navigator.clipboard.writeText(negocioCfg.clabe).then(() => toast('CLABE copiada', 'success'));
+}
+function refrescarCLABEUI() {
+  const numEl = document.getElementById('clabeNum');
+  if (!numEl) return;
+  if (negocioCfg.clabe) {
+    numEl.textContent = formatCLABE(negocioCfg.clabe);
+    numEl.style.color = '';
+  } else {
+    numEl.textContent = 'CLABE no configurada — Brenda debe cargarla en Configuración › Datos del negocio';
+    numEl.style.color = 'var(--danger)';
+  }
+  // Sub texto con banco y titular
+  const lbl = document.querySelector('.spei-clabe-label');
+  if (lbl && negocioCfg.banco) lbl.textContent = `CLABE — ${negocioCfg.banco}${negocioCfg.titular ? ' · ' + negocioCfg.titular : ''}`;
+  else if (lbl) lbl.textContent = 'CLABE interbancaria';
 }
 
 function agregarExtra() {
@@ -595,17 +711,109 @@ function recalcularTotal() {
   const base = svc ? Number(svc.precio) : 0;
   const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
   const propina = parseFloat(document.getElementById('cobroPropina')?.value) || 0;
-  const total = base + extras + propina;
+  const subtotal = base + extras;
+  const descMonto = cobroDescuento ? cobroDescuento.monto : 0;
+  const total = Math.max(0, subtotal - descMonto) + propina;
+
   const el = document.getElementById('cobroTotalDisplay');
   if (el) el.textContent = '$' + total.toLocaleString('es-MX');
   const desglose = document.getElementById('cobroDesglose');
   const partes = [`base $${base.toLocaleString('es-MX')}`];
   if (extras) partes.push(`extras $${extras.toLocaleString('es-MX')}`);
+  if (descMonto) partes.push(`<span style="color:var(--accent)">– desc. $${descMonto.toLocaleString('es-MX')}</span>`);
   if (propina) partes.push(`propina $${propina.toLocaleString('es-MX')}`);
-  if (desglose) desglose.textContent = partes.join(' + ');
-  // Actualizar monto SPEI
+  if (desglose) desglose.innerHTML = partes.join(' + ');
   const speiAmt = document.getElementById('speiAmount');
   if (speiAmt) speiAmt.textContent = `Monto a transferir: $${total.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+}
+
+// ─── Descuento con autorización WhatsApp ─────────────────────────
+function abrirModalDescuento() {
+  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
+  const base = svc ? Number(svc.precio) : 0;
+  const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
+  document.getElementById('descTipo').value = 'monto';
+  document.getElementById('descValor').value = '';
+  document.getElementById('descRazon').value = '';
+  document.getElementById('descAutPor').value = 'Brenda';
+  document.getElementById('descVia').value = 'whatsapp';
+  document.getElementById('descSubtotal').textContent = '$' + (base+extras).toLocaleString('es-MX');
+  document.getElementById('descMonto').textContent = '- $0';
+  document.getElementById('descTotalFinal').textContent = '$' + (base+extras).toLocaleString('es-MX');
+  document.getElementById('btnPedirAut').disabled = true;
+  document.getElementById('modalDescuento').classList.add('open');
+}
+function recalcularDescuento() {
+  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
+  const base = svc ? Number(svc.precio) : 0;
+  const extras = cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
+  const subtotal = base + extras;
+  const tipo = document.getElementById('descTipo').value;
+  const valor = parseFloat(document.getElementById('descValor').value) || 0;
+  let monto = tipo === 'porcentaje' ? Math.round(subtotal * valor / 100) : Math.round(valor);
+  if (monto > subtotal) monto = subtotal;
+  document.getElementById('descSubtotal').textContent = '$' + subtotal.toLocaleString('es-MX');
+  document.getElementById('descMonto').textContent = '- $' + monto.toLocaleString('es-MX');
+  document.getElementById('descTotalFinal').textContent = '$' + (subtotal - monto).toLocaleString('es-MX');
+  document.getElementById('btnPedirAut').disabled = !(monto > 0 && document.getElementById('descRazon').value.trim());
+  return monto;
+}
+document.addEventListener('input', e => {
+  if (['descTipo','descValor','descRazon'].includes(e.target.id)) recalcularDescuento();
+});
+function pedirAutorizacionWA() {
+  if (!negocioCfg.whatsappBrenda) {
+    toast('Brenda no ha configurado su WhatsApp en Configuración', 'error');
+    return;
+  }
+  const svc = citaSeleccionada ? servicios.find(s => s.id === citaSeleccionada.servicioId) : null;
+  const cli = clientes.find(c => c.id === citaSeleccionada?.clienteId);
+  const subtotal = (svc ? Number(svc.precio) : 0) + cobroExtras.reduce((s,e) => s + (e.precio||0), 0);
+  const monto = recalcularDescuento();
+  const razon = document.getElementById('descRazon').value.trim();
+  const usuario = (window.currentUser && window.currentUser.nombre) || 'una Nail Tech';
+
+  const msg = [
+    `Hola Brenda, soy ${usuario}.`,
+    ``,
+    `Te pido autorización para aplicar un descuento:`,
+    `• Cliente: ${cli ? cli.nombre : 'sin cliente'}`,
+    `• Servicio: ${svc ? svc.nombre : '-'}`,
+    `• Subtotal: $${subtotal.toLocaleString('es-MX')}`,
+    `• Descuento: $${monto.toLocaleString('es-MX')}`,
+    `• Total final: $${(subtotal-monto).toLocaleString('es-MX')}`,
+    `• Razón: ${razon}`,
+    ``,
+    `¿Lo autorizas? (sí / no)`,
+  ].join('\n');
+
+  const wa = `https://wa.me/${negocioCfg.whatsappBrenda}?text=${encodeURIComponent(msg)}`;
+  window.open(wa, '_blank');
+}
+function aplicarDescuento() {
+  const monto = recalcularDescuento();
+  const razon = document.getElementById('descRazon').value.trim();
+  const autPor = document.getElementById('descAutPor').value.trim();
+  const via = document.getElementById('descVia').value;
+
+  if (monto <= 0) { toast('Captura un descuento válido', 'error'); return; }
+  if (!razon) { toast('Captura la razón del descuento', 'error'); return; }
+  if (!autPor) { toast('Captura quién autorizó', 'error'); return; }
+
+  cobroDescuento = { monto, razon, autorizadoPor: autPor, via };
+  document.getElementById('descuentoBox').style.display = '';
+  document.getElementById('descResumen').textContent = `Descuento de $${monto.toLocaleString('es-MX')} — ${razon}`;
+  document.getElementById('descMeta').textContent = `Autorizado por ${autPor} (${via === 'whatsapp' ? 'WhatsApp' : via === 'voz' ? 'voz' : via === 'presencial' ? 'presencial' : 'pendiente'})`;
+  document.getElementById('btnAplicarDescuento').style.display = 'none';
+  cerrarModal('modalDescuento');
+  recalcularTotal();
+  toast('Descuento aplicado', 'success');
+}
+function quitarDescuento() {
+  cobroDescuento = null;
+  document.getElementById('descuentoBox').style.display = 'none';
+  document.getElementById('btnAplicarDescuento').style.display = '';
+  recalcularTotal();
 }
 async function confirmarCobro() {
   if (!cobroMetodo) { toast('Selecciona método de pago', 'error'); return; }
@@ -616,17 +824,60 @@ async function confirmarCobro() {
   const propina = parseFloat(document.getElementById('cobroPropina').value) || 0;
   const extrasValidos = cobroExtras.filter(e => e.desc || e.precio);
   const totalExtras = extrasValidos.reduce((s,e) => s + (e.precio||0), 0);
-  const totalCobrado = montoBase + totalExtras + propina;
+  const descMonto = cobroDescuento ? cobroDescuento.monto : 0;
+  const totalCobrado = Math.max(0, montoBase + totalExtras - descMonto) + propina;
   try {
     const r = await fetch('/api/citas', {
-      method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ ...citaSeleccionada, estado:'completada', metodoPago:cobroMetodo, montoBase, extras:extrasValidos, propina, totalCobrado })
+      method: 'PUT', headers: {'Content-Type':'application/json'}, credentials:'same-origin',
+      body: JSON.stringify({ id: citaSeleccionada.id, estado:'completada', metodoPago:cobroMetodo, montoBase, extras:extrasValidos, propina, totalCobrado, descuento: descMonto, descuentoRazon: cobroDescuento?.razon || '', descuentoAutorizadoPor: cobroDescuento?.autorizadoPor || '' })
     });
     const d = await r.json();
     if (d.ok) {
       toast(`$${totalCobrado.toLocaleString('es-MX')} cobrado vía ${cobroMetodo}`, 'success');
+      // Persistir descuento en su tabla de auditoría — esperamos respuesta para alertar si falla
+      if (cobroDescuento && cobroDescuento.monto > 0) {
+        try {
+          const auditR = await fetch('/api/descuentos', {
+            method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'same-origin',
+            body: JSON.stringify({
+              citaId: citaSeleccionada.id,
+              clienteId: citaSeleccionada.clienteId,
+              servicioId: citaSeleccionada.servicioId,
+              tecnicaId: citaSeleccionada.tecnicaId,
+              montoOriginal: montoBase + totalExtras,
+              monto: cobroDescuento.monto,
+              montoFinalSinPropina: Math.max(0, montoBase + totalExtras - cobroDescuento.monto),
+              montoFinal: totalCobrado,
+              razon: cobroDescuento.razon,
+              autorizadoPor: cobroDescuento.autorizadoPor,
+              via: cobroDescuento.via,
+              fecha: citaSeleccionada.fecha,
+            })
+          });
+          const auditD = await auditR.json();
+          if (!auditD.ok) {
+            toast('Cobro OK pero el descuento NO se registró en auditoría — avisa a Brenda', 'error');
+            // Marca la cita con flag pendiente para reintentar luego
+            fetch('/api/citas', {
+              method: 'PUT', headers: {'Content-Type':'application/json'}, credentials: 'same-origin',
+              body: JSON.stringify({ id: citaSeleccionada.id, descuentoLogPendiente: true })
+            }).catch(() => {});
+          }
+        } catch (e) {
+          toast('Cobro OK pero el descuento NO se registró en auditoría — avisa a Brenda', 'error');
+        }
+      }
       cerrarModal('modalCobro');
       await cargarCitas(); renderCalendario();
+      // Lealtad: backend cuenta TODAS las visitas completadas de la clienta (no solo las del día)
+      const visitasTotales = d.totalVisitasCliente;
+      if (citaSeleccionada?.clienteId && visitasTotales > 0 && visitasTotales % 10 === 0) {
+        const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
+        const nombre = cli ? cli.nombre.split(' ')[0] : 'esta clienta';
+        setTimeout(() => {
+          alert(`Visita #${visitasTotales} de ${nombre}\n\n${nombre} se ganó un servicio gratis.\n\nComéntaselo ahora — lo puedes agendar en la próxima cita.`);
+        }, 800);
+      }
     } else toast(d.error || 'Error', 'error');
   } catch(e) { toast('Error de conexión', 'error'); }
   finally { btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar cobro'; }
@@ -721,7 +972,7 @@ init();
   var items=[
     ['agenda','/index.html','Agenda','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'],
     ['clientes','/clientes.html','Clientes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'],
-    ['whatsapp','/whatsapp.html','WhatsApp','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'],
+    
     ['reportes','/reportes.html','Reportes','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'],
     ['config','/config.html','Config','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>'],
   ];

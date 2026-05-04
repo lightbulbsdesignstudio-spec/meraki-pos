@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socios — Meraki Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/assets/styles.css?v=4">
+  <script src="/assets/session.js" defer></script>
+</head>
+<body data-page-rol="admin,socio">
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="brand">MERAKI NAILS</div>
+    <div class="sub">Sistema de gestión</div>
+  </div>
+  <div class="nav-links">
+    <a href="/index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agenda
+    </a>
+    <a href="/clientes.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Clientes
+    </a>
+    <a href="/servicios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Servicios</a>
+    <a href="/reportes.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reportes
+    </a>
+    <a data-rol="admin,socio" href="/socios.html" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Socios
+    </a>
+    <a data-rol="admin" href="/config.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>
+      Configuración
+    </a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Socios</h1>
+    <div class="topbar-actions">
+      <button class="btn btn-secondary" onclick="abrirConfig()">Actualizar inversión</button>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- KPIs de recuperación -->
+    <div id="kpisRecuperacion" class="grid-4" style="margin-bottom:24px"></div>
+
+    <!-- Barra de progreso de recuperación -->
+    <div class="card" style="margin-bottom:24px" id="cardProgress">
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:16px">
+          <div style="min-width:0">
+            <div style="font-weight:700;font-size:16px;font-family:'DM Sans',sans-serif">Recuperación de inversión</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:2px" id="labelProgress">Calculando…</div>
+          </div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:700;color:var(--accent);flex-shrink:0" id="pctProgress">—%</div>
+        </div>
+        <div style="height:12px;background:var(--surface-2);border-radius:999px;overflow:hidden;border:1px solid var(--border)">
+          <div id="barraProgress" style="height:100%;background:linear-gradient(90deg,var(--accent),#E8A070);border-radius:999px;transition:width .8s ease;width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid: Costos fijos + Proyección -->
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card" id="cardCostos">
+        <div class="card-body">
+          <div style="font-weight:700;font-size:15px;margin-bottom:14px;font-family:'DM Sans',sans-serif">Costos fijos mensuales</div>
+          <div id="listaCostos"></div>
+        </div>
+      </div>
+      <div class="card" id="cardProyeccion">
+        <div class="card-body">
+          <div style="font-weight:700;font-size:15px;margin-bottom:14px;font-family:'DM Sans',sans-serif">Proyección financiera</div>
+          <div id="detalleProyeccion"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ingresos por mes -->
+    <div class="card">
+      <div class="card-body">
+        <div style="font-weight:700;font-size:15px;margin-bottom:16px;font-family:'DM Sans',sans-serif">Ingresos por mes</div>
+        <div id="historialMeses"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal config inversión -->
+<div class="modal-backdrop" id="modalConfig">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Actualizar inversión</h3>
+      <button class="btn btn-ghost btn-sm" onclick="cerrarModal('modalConfig')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Inversión total ($MXN)</label><input type="number" id="cfgTotal" placeholder="300000"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Renta mensual ($)</label><input type="number" id="cfgRenta" placeholder="33500"></div>
+        <div class="form-group"><label>Sueldos por semana ($)</label><input type="number" id="cfgSueldos" placeholder="6000"></div>
+      </div>
+      <div class="form-group"><label>Insumos mensuales ($)</label><input type="number" id="cfgInsumos" placeholder="1000"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalConfig')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarConfig()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+let datos = null;
+
+async function cargar() {
+  try {
+    const r = await fetch('/api/socios');
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    datos = d.data;
+    renderTodo();
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString('es-MX'); }
+function fmtPct(n) { return n + '%'; }
+
+function renderTodo() {
+  if (!datos) return;
+  const { inversion, costosFijos, operacion, ingresosPorMes } = datos;
+
+  // KPIs
+  const kpis = [
+    { label: 'Inversión total', valor: fmt(inversion.total), sub: `desde ${inversion.fechaInicio || '—'}`, color: 'var(--text-muted)' },
+    { label: 'Ingresos acumulados', valor: fmt(inversion.recuperado), sub: 'desde apertura', color: 'var(--accent)' },
+    { label: 'Por recuperar', valor: fmt(inversion.pendiente), sub: 'saldo pendiente', color: inversion.pendiente > 0 ? 'var(--danger)' : 'var(--success)' },
+    { label: 'Servicios completados', valor: operacion.citasCompletadas.toLocaleString('es-MX'), sub: 'total histórico', color: 'var(--text-muted)' },
+  ];
+  document.getElementById('kpisRecuperacion').innerHTML = kpis.map(k => `
+    <div class="card" style="text-align:center;padding:20px 16px">
+      <div style="font-size:22px;font-family:'DM Sans',sans-serif;font-weight:700;color:${k.color}">${k.valor}</div>
+      <div style="font-size:13px;font-weight:600;margin-top:4px">${k.label}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${k.sub}</div>
+    </div>
+  `).join('');
+
+  // Barra de progreso
+  const pct = Math.min(inversion.pctRecuperado, 100);
+  document.getElementById('pctProgress').textContent = fmtPct(inversion.pctRecuperado);
+  document.getElementById('barraProgress').style.width = pct + '%';
+  document.getElementById('labelProgress').textContent = inversion.pendiente > 0
+    ? `${fmt(inversion.recuperado)} de ${fmt(inversion.total)} recuperados`
+    : `¡Inversión recuperada! Excedente: ${fmt(inversion.recuperado - inversion.total)}`;
+
+  // Costos fijos
+  const costos = [
+    { label: 'Renta', valor: fmt(costosFijos.rentaMensual) },
+    { label: 'Sueldos (×4.33 sem.)', valor: fmt(costosFijos.sueldosMensual) },
+    { label: 'Insumos', valor: fmt(costosFijos.insumosMensual) },
+  ];
+  document.getElementById('listaCostos').innerHTML = costos.map(c => `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)">
+      <span style="color:var(--text-muted)">${c.label}</span>
+      <strong>${c.valor}</strong>
+    </div>
+  `).join('') + `
+    <div style="display:flex;justify-content:space-between;padding:10px 0;margin-top:4px">
+      <span style="font-weight:600">Total mensual</span>
+      <strong style="color:var(--danger)">${fmt(costosFijos.total)}</strong>
+    </div>
+  `;
+
+  // Proyección
+  const util = operacion.utilidadNetaMensual;
+  const meses = operacion.mesesParaRecuperar;
+  document.getElementById('detalleProyeccion').innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)">
+      <span style="color:var(--text-muted)">Promedio mensual</span>
+      <strong>${fmt(operacion.avgMensual)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)">
+      <span style="color:var(--text-muted)">Costos fijos</span>
+      <strong style="color:var(--danger)">− ${fmt(costosFijos.total)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;margin-top:4px">
+      <span style="font-weight:600">Utilidad neta mensual</span>
+      <strong style="color:${util >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt(util)}</strong>
+    </div>
+    ${meses ? `
+    <div style="margin-top:14px;background:var(--accent-light);border-radius:10px;padding:12px 14px;border:1px solid var(--accent-mid)">
+      <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:3px">PROYECCIÓN DE RECUPERACIÓN</div>
+      <div style="font-size:15px;font-weight:700">~${meses} ${meses === 1 ? 'mes' : 'meses'}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">con el ritmo actual</div>
+    </div>
+    ` : util <= 0 ? `
+    <div style="margin-top:14px;background:var(--danger-light);border-radius:10px;padding:12px 14px">
+      <div style="font-size:12px;color:var(--danger);font-weight:600">ATENCIÓN</div>
+      <div style="font-size:13px;margin-top:2px">Los costos superan los ingresos actuales. Se necesita aumentar el volumen.</div>
+    </div>
+    ` : `<div style="margin-top:14px;font-size:13px;color:var(--text-muted)">Calculando proyección — se necesitan más datos.</div>`}
+  `;
+
+  // Ingresos por mes
+  const mesesOrdenados = Object.entries(ingresosPorMes).sort((a, b) => a[0].localeCompare(b[0]));
+  const maxIngreso = Math.max(...mesesOrdenados.map(([,v]) => v), 1);
+  if (mesesOrdenados.length === 0) {
+    document.getElementById('historialMeses').innerHTML = '<div class="empty"><p>Sin datos aún. Los ingresos aparecerán aquí una vez que se completen servicios.</p></div>';
+  } else {
+    document.getElementById('historialMeses').innerHTML = mesesOrdenados.map(([mes, ing]) => {
+      const pctBar = Math.round((ing / maxIngreso) * 100);
+      const pctRecup = inversion.total > 0 ? Math.round((ing / inversion.total) * 100) : 0;
+      const [anio, m] = mes.split('-');
+      const nombreMes = new Date(Number(anio), Number(m) - 1, 1).toLocaleString('es-MX', { month: 'long', year: 'numeric' });
+      return `
+        <div style="display:grid;grid-template-columns:130px 1fr 100px 80px;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid var(--border-light)">
+          <div style="font-size:13px;text-transform:capitalize">${nombreMes}</div>
+          <div style="height:8px;background:var(--surface-3);border-radius:999px;overflow:hidden">
+            <div style="height:100%;background:var(--accent);border-radius:999px;width:${pctBar}%;transition:width .5s ease"></div>
+          </div>
+          <div style="font-weight:700;text-align:right">${fmt(ing)}</div>
+          <div style="font-size:11px;color:var(--text-muted);text-align:right">${pctRecup}% inv.</div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function abrirConfig() {
+  if (datos) {
+    document.getElementById('cfgTotal').value = datos.inversion.total || '';
+    document.getElementById('cfgRenta').value = datos.costosFijos.rentaMensual || '';
+    document.getElementById('cfgSueldos').value = datos.costosFijos.sueldosMensual / 4.33 | 0;
+    document.getElementById('cfgInsumos').value = datos.costosFijos.insumosMensual || '';
+  }
+  document.getElementById('modalConfig').classList.add('open');
+}
+
+async function guardarConfig() {
+  const body = {
+    total: parseFloat(document.getElementById('cfgTotal').value) || 0,
+    costosFijos: {
+      renta: parseFloat(document.getElementById('cfgRenta').value) || 0,
+      sueldosSemana: parseFloat(document.getElementById('cfgSueldos').value) || 0,
+      insumos: parseFloat(document.getElementById('cfgInsumos').value) || 0,
+    }
+  };
+  const r = await fetch('/api/socios', { method: 'PUT', headers:{'Content-Type':'application/json'}, credentials: 'same-origin', body: JSON.stringify(body) });
+  const d = await r.json();
+  if (d.ok) { toast('Configuración guardada', 'success'); cerrarModal('modalConfig'); cargar(); }
+  else toast(d.error || 'Error', 'error');
+}
+
+function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toast(msg, type='') {
+  const div = document.createElement('div'); div.className = `toast ${type}`; div.textContent = msg;
+  const container = document.getElementById('toasts'); container.appendChild(div);
+  setTimeout(() => div.remove(), 3000);
+}
+
+cargar();
+</script>
+</body>
+</html>
