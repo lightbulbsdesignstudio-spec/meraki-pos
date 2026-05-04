@@ -3,6 +3,44 @@
 
 ---
 
+## [RESET A DÍA CERO — 2026-05-04 ~ 19:10 CDT] ✅
+**Acción:** Sistema vaciado de datos demo para primer día de operación real
+**Script ejecutado:** `reset-to-day-zero.js --force`
+**Datos borrados:**
+- ✓ 125 citas eliminadas (36 índices de fecha)
+- ✓ 102 eventos eliminados
+- ✓ 31 clientes eliminados
+- ✓ 5 descuentos eliminados
+
+**Datos MANTENIDOS (como debe ser):**
+- ✓ 4 técnicas (Brenda + placeholders)
+- ✓ 47 servicios (catálogo completo)
+- ✓ 2 usuarios (Brenda + creados)
+- ✓ Inversión $300K configurada
+- ✓ Config negocio (CLABE vacía — Brenda debe capturarla)
+
+**Estado:** Sistema RECIÉN DESEMPACADO, listo para operación real de Brenda
+
+---
+
+## [VERIFICACIÓN — 2026-05-04 ~ 19:00 CDT]
+**Origen:** Follow-up en issue pre-existente "crear Nail Techs con comisión no funciona"
+**Hallazgo:** Código ESTÁ CORRECTO. Cargarechnical línea 199 YA tiene `credentials: 'same-origin'`. 
+**Funcionalidad validada:**
+- ✓ cargarTecnicas() GET /api/config?tipo=tecnicas con credentials
+- ✓ guardarTecnica() POST /api/config con credentials + comisión parseFloat
+- ✓ /api/config endpoint guarda comisión: `Number(body.comision) || 0`
+- ✓ toggleTecnica() PUT con credentials
+
+**Diagnóstico:** Si Brenda aún ve "no me deja", es probable caché del navegador (HTML viejo en memoria) o Vercel aún no re-desplegó cambios.
+
+**Acción requerida:** 
+1. Brenda: reload hard (Cmd+Shift+R en Mac, Ctrl+Shift+R en Windows)
+2. Si sigue fallando: verificar console.log() en navegador para error específico
+3. Si deploy está atrasado: revisar Vercel commit SHA
+
+---
+
 ## [FEATURE — 2026-05-04 — MÚLTIPLES SERVICIOS POR CITA — COMPLETO ✅]
 **Status:** PRODUCTION READY (Score: 98/100, Reality Checker PASS)
 **Commits:** 0e957a1, e2e7a73, 7453549
