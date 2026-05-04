@@ -657,10 +657,12 @@ async function cambiarEstadoCita(nuevoEstado) {
 function enviarRecordatorio() {
   if (!citaSeleccionada) return;
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
-  const svc = servicios.find(s => s.id === citaSeleccionada.servicioId);
+  const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+  const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+  const servicioNombres = svcObjs.map(s => s.nombre).join(', ');
   const tec = tecnicos.find(t => t.id === citaSeleccionada.tecnicaId);
   if (!cli?.tel) { toast('Esta clienta no tiene teléfono registrado', 'error'); return; }
-  const msg = encodeURIComponent(`Hola ${cli.nombre.split(' ')[0]}, te recuerdo tu cita mañana a las ${formatHour(citaSeleccionada.hora)} con ${tec?.nombre} para ${svc?.nombre}. ¿Confirmas? — Meraki Nails`);
+  const msg = encodeURIComponent(`Hola ${cli.nombre.split(' ')[0]}, te recuerdo tu cita mañana a las ${formatHour(citaSeleccionada.hora)} con ${tec?.nombre} para ${servicioNombres}. ¿Confirmas? — Meraki Nails`);
   window.open(`https://wa.me/52${cli.tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
 
@@ -905,6 +907,7 @@ async function confirmarCobro() {
               citaId: citaSeleccionada.id,
               clienteId: citaSeleccionada.clienteId,
               servicioId: citaSeleccionada.servicioId,
+              servicios: citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []),
               tecnicaId: citaSeleccionada.tecnicaId,
               montoOriginal: montoBase + totalExtras,
               monto: cobroDescuento.monto,
