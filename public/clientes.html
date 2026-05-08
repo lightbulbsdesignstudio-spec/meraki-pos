@@ -170,12 +170,18 @@ function citasDe(clienteId) {
               .sort((a, b) => b.fecha.localeCompare(a.fecha));
 }
 
+function getServiciosDeCita(c) {
+  const arr = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+  return arr.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+}
+
+function montoCita(c) {
+  if (c.totalCobrado != null) return Number(c.totalCobrado);
+  return getServiciosDeCita(c).reduce((sum, s) => sum + Number(s.precio || 0), 0);
+}
+
 function totalGastado(citasCli) {
-  return citasCli.reduce((sum, c) => {
-    if (c.totalCobrado != null) return sum + Number(c.totalCobrado);
-    const svc = servicios.find(s => s.id === c.servicioId);
-    return sum + (svc ? Number(svc.precio) : 0);
-  }, 0);
+  return citasCli.reduce((sum, c) => sum + montoCita(c), 0);
 }
 
 function diasDesdeUltima(citasCli) {
@@ -426,15 +432,18 @@ async function verHistorial(id) {
     ? '<div class="empty" style="padding:32px 0"><div class="empty-icon">📅</div><p>Sin citas registradas aún.</p></div>'
     : `<div style="display:flex;flex-direction:column;gap:8px">
         ${cc.map(cit => {
-          const svc  = servicios.find(s => s.id === cit.servicioId);
+          const svcObjs = getServiciosDeCita(cit);
+          const svcLabel = svcObjs.length === 0 ? '—'
+            : svcObjs.length === 1 ? svcObjs[0].nombre
+            : `${svcObjs[0].nombre} +${svcObjs.length - 1}`;
           const tec  = tecnicos.find(t => t.id === cit.tecnicaId);
-          const cobrado = cit.totalCobrado != null ? Number(cit.totalCobrado) : (svc ? Number(svc.precio) : 0);
+          const cobrado = montoCita(cit);
           const estadoColor = cit.estado === 'completada' ? 'var(--success)' : cit.estado === 'cancelada' ? 'var(--danger)' : 'var(--warning)';
           const estadoBg    = cit.estado === 'completada' ? 'var(--success-light)' : cit.estado === 'cancelada' ? 'var(--danger-light)' : 'var(--warning-light)';
           return `<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border:1px solid var(--border);border-radius:9px;font-size:13.5px">
             <div>
               <div style="font-weight:600">${cit.fecha} · ${cit.hora}</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${svc?.nombre || '—'}${tec ? ' · ' + tec.nombre : ''}${cit.notas ? ' · ' + cit.notas.slice(0,30) : ''}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${svcLabel}${tec ? ' · ' + tec.nombre : ''}${cit.notas ? ' · ' + cit.notas.slice(0,30) : ''}</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
               ${cobrado > 0 ? `<strong style="color:var(--accent)">$${cobrado.toLocaleString('es-MX')}</strong>` : ''}

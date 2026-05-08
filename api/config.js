@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   // Lectura: cualquier sesión autenticada. Mutaciones: solo admin.
   const blocked = await requireAuth(req, res, req.method === 'GET' ? null : ['admin']);
   if (blocked) return;
-  const { tipo } = req.method === 'GET' ? req.query : (await parseBody(req));
+  const body = req.method === 'GET' ? null : await parseBody(req);
+  const tipo = req.method === 'GET' ? req.query.tipo : body?.tipo;
 
   try {
     if (req.method === 'GET') {
@@ -25,8 +26,6 @@ export default async function handler(req, res) {
       }
       return res.status(400).json({ ok: false, error: 'tipo requerido' });
     }
-
-    const body = await parseBody(req);
 
     if (req.method === 'POST') {
       const id = newId();

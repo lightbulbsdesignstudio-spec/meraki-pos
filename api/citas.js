@@ -34,7 +34,9 @@ async function logEvento(cita, servicios) {
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  const blocked = await requireAuth(req, res);
+  // Borrado de cita: solo admin/socio (evita que una empleada borre cita ajena).
+  const rolesRequeridos = req.method === 'DELETE' ? ['admin','socio'] : null;
+  const blocked = await requireAuth(req, res, rolesRequeridos);
   if (blocked) return;
 
   try {

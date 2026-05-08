@@ -71,7 +71,7 @@ export default async function handler(req, res) {
         data: {
           inversion: {
             total: inversionTotal,
-            recuperado: ingresoTotal,
+            recuperado,
             pendiente,
             pctRecuperado,
             fechaInicio: config?.fecha,

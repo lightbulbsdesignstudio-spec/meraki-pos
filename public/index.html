@@ -486,11 +486,15 @@ function renderCalendario() {
 
       const chips = citasHora.map(c => {
         const cli = clientes.find(cl => cl.id === c.clienteId);
-        const svc = servicios.find(s => s.id === c.servicioId);
+        const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+        const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
+        const svcLabel = svcObjs.length === 0 ? ''
+          : svcObjs.length === 1 ? svcObjs[0].nombre
+          : `${svcObjs[0].nombre} +${svcObjs.length - 1}`;
         const icono = c.estado === 'secando' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' : '';
         return `<div class="cita-chip ${c.estado}" onclick="verCita('${c.id}')">
           <strong>${icono}${cli ? cli.nombre.split(' ')[0] : 'Cliente'}</strong><br>
-          <span style="font-size:11px">${svc ? svc.nombre : ''}</span>
+          <span style="font-size:11px">${svcLabel}</span>
         </div>`;
       }).join('');
 

@@ -4,7 +4,9 @@ import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  const blocked = await requireAuth(req, res);
+  // Lectura y alta: cualquier sesión. Edición y borrado: solo admin/socio.
+  const rolesRequeridos = ['PUT','DELETE'].includes(req.method) ? ['admin','socio'] : null;
+  const blocked = await requireAuth(req, res, rolesRequeridos);
   if (blocked) return;
 
   try {

@@ -164,10 +164,16 @@ async function cargarDescuentos(desde, hasta, periodoLabel) {
     const totalDesc = list.reduce((s, x) => s + (x.monto || 0), 0);
     if (resumen) resumen.textContent = `${list.length} descuentos · $${totalDesc.toLocaleString('es-MX')} otorgados · ${periodoLabel || ''}`;
     const viaLabel = v => v === 'whatsapp' ? 'WhatsApp' : v === 'voz' ? 'Voz' : v === 'presencial' ? 'Presencial' : 'Pendiente';
+    const labelServiciosDescuento = d => {
+      const arr = (d.servicios && d.servicios.length) ? d.servicios : (d.servicioId ? [{id: d.servicioId}] : []);
+      const nombres = arr.map(s => _serviciosCache?.[s.id]?.nombre).filter(Boolean);
+      if (!nombres.length) return '—';
+      return nombres.length === 1 ? nombres[0] : `${nombres[0]} +${nombres.length - 1}`;
+    };
     tb.innerHTML = list.map(d => `<tr>
       <td>${d.fecha || '—'}</td>
       <td>${escapeHtml(clienteNombrePorId(d.clienteId))}</td>
-      <td>${escapeHtml(servicioNombrePorId(d.servicioId))}</td>
+      <td>${escapeHtml(labelServiciosDescuento(d))}</td>
       <td>$${(d.montoOriginal||0).toLocaleString('es-MX')}</td>
       <td style="color:var(--accent);font-weight:600">- $${(d.monto||0).toLocaleString('es-MX')}</td>
       <td><strong>$${(d.montoFinal||0).toLocaleString('es-MX')}</strong></td>
