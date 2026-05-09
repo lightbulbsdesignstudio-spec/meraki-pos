@@ -72,14 +72,14 @@ async function corridaRol(rol) {
     // Si la empleada no pudo borrar, limpiamos con admin después
   }
 
-  // 6. /api/admin-status — solo admin
-  const status = await f('/api/admin-status');
-  if (rol.user.startsWith('admin')) log(status.ok, '/api/admin-status accesible para admin');
-  else log(status.status === 403, `/api/admin-status bloqueado para ${rol.user.split('_')[0]}`);
+  // 6. /api/status?full=1 — solo admin
+  const statusFull = await f('/api/status?full=1');
+  if (rol.user.startsWith('admin')) log(statusFull.ok, '/api/status?full=1 accesible para admin');
+  else log(statusFull.status === 403, `/api/status?full=1 bloqueado para ${rol.user.split('_')[0]}`);
 
-  // 7. /api/health — debe ser público
-  const health = await fetch(`${BASE}/api/health`).then(r => r.json());
-  log(health.ok && health.redis.ok, '/api/health responde OK');
+  // 7. /api/status (público) — debe responder sin auth
+  const health = await fetch(`${BASE}/api/status`).then(r => r.json());
+  log(health.ok && health.redis.ok, '/api/status (público) responde OK');
 
   // Logout
   await f('/api/auth?action=logout', { method: 'POST' });

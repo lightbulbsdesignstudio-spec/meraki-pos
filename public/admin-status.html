@@ -118,7 +118,7 @@ function showTab(name) {
 async function cargar() {
   document.getElementById('btnRefresh').disabled = true;
   try {
-    const r = await fetch('/api/admin-status?errors=100&audit=200', { credentials: 'same-origin' });
+    const r = await fetch('/api/status?full=1&errors=100&audit=200', { credentials: 'same-origin' });
     if (!r.ok) {
       const err = await r.json().catch(() => ({}));
       alert('Error cargando estado: ' + (err.error || r.status));
@@ -204,7 +204,7 @@ async function cargarSchema() {
   btn.disabled = true;
   btn.textContent = 'Auditando…';
   try {
-    const r = await fetch('/api/admin-status?schema=1&errors=0&audit=0', { credentials: 'same-origin' });
+    const r = await fetch('/api/status?full=1&schema=1&errors=0&audit=0', { credentials: 'same-origin' });
     if (!r.ok) {
       const err = await r.json().catch(() => ({}));
       alert('Error: ' + (err.error || r.status));

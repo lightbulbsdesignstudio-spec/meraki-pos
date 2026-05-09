@@ -1,6 +1,15 @@
+// /api/status — endpoint dual:
+//   GET /api/status               → health público (UptimeRobot, frontend)
+//   GET /api/status?full=1        → admin auth: health + errors + audit + schema opcional
+//
+// Combinado en un solo file por límite de 12 serverless functions del plan Hobby Vercel.
 import redis, { keys } from '../lib/redis.js';
 import { requireAuth } from '../lib/auth.js';
 import { pingRedis, readErrors, readAudit, logError } from '../lib/observability.js';
+
+const STARTED_AT = new Date().toISOString();
+const VERSION = process.env.VERCEL_GIT_COMMIT_SHA || 'dev';
+const REGION = process.env.VERCEL_REGION || 'local';
 
 async function citaSchemaBreakdown() {
   const ids = await redis.smembers(keys.citas());
@@ -18,24 +27,38 @@ async function citaSchemaBreakdown() {
   return { total: ids.length, nuevas, legacy, hibridas, vacias };
 }
 
-const STARTED_AT = new Date().toISOString();
-const VERSION = process.env.VERCEL_GIT_COMMIT_SHA || 'dev';
-const REGION = process.env.VERCEL_REGION || 'local';
-
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'Método no permitido' });
 
+  const wantFull = req.query.full === '1';
+
+  // Modo público: solo health. Sin auth — pingeable por UptimeRobot/cron-job.org.
+  if (!wantFull) {
+    const ping = await pingRedis();
+    const ok = ping.ok === true;
+    return res.status(ok ? 200 : 503).json({
+      ok,
+      service: 'meraki-pos',
+      version: VERSION,
+      region: REGION,
+      startedAt: STARTED_AT,
+      now: new Date().toISOString(),
+      redis: ping,
+    });
+  }
+
+  // Modo full: auth admin + payload completo.
   const blocked = await requireAuth(req, res, ['admin']);
   if (blocked) return;
 
   try {
     const errorsLimit = Math.min(Number(req.query.errors) || 50, 200);
     const auditLimit = Math.min(Number(req.query.audit) || 100, 500);
-
     const wantSchema = req.query.schema === '1';
+
     const [ping, errors, audit, schema] = await Promise.all([
       pingRedis(),
       readErrors(errorsLimit),
@@ -61,7 +84,7 @@ export default async function handler(req, res) {
       },
     });
   } catch (e) {
-    await logError('api/admin-status', e, { method: req.method });
+    await logError('api/status', e, { method: req.method });
     return res.status(500).json({ ok: false, error: e.message });
   }
 }
