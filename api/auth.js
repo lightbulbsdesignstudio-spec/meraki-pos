@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import redis, { keys } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { newToken, setSessionCookie, clearSessionCookie, getSessionUser } from '../lib/auth.js';
-import { logError } from '../lib/observability.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 const SESSION_TTL = 60 * 60 * 12;
 
@@ -64,6 +64,7 @@ export default async function handler(req, res) {
         // Incrementar contador con TTL 15min
         const newAttempts = await redis.incr(attemptsKey);
         if (newAttempts === 1) await redis.expire(attemptsKey, 60 * 15);
+        await logAudit({ action: 'auth.login_failed', resource: 'session', meta: { username, attempts: newAttempts, ip: req.headers['x-forwarded-for'] || null, ua: req.headers['user-agent'] || null } });
         return res.status(401).json({ ok: false, error: 'Usuario o contraseña incorrectos' });
       }
 
@@ -76,6 +77,7 @@ export default async function handler(req, res) {
       await redis.sadd(`mk:user:sessions:${user.id}`, token);
       setSessionCookie(res, token);
       const { passwordHash, ...safe } = user;
+      await logAudit({ actor: safe, action: 'auth.login', resource: 'session', meta: { ip: req.headers['x-forwarded-for'] || null, ua: req.headers['user-agent'] || null } });
       return res.json({ ok: true, data: safe });
     }
 
@@ -84,8 +86,10 @@ export default async function handler(req, res) {
         const [k, v] = p.trim().split('='); if (k) a[k] = v; return a;
       }, {});
       const token = cookies['mk_session'];
+      const userBeforeLogout = await getSessionUser(req);
       if (token) await redis.del(keys.session(token));
       clearSessionCookie(res);
+      if (userBeforeLogout) await logAudit({ actor: userBeforeLogout, action: 'auth.logout', resource: 'session' });
       return res.json({ ok: true });
     }
 
@@ -101,6 +105,7 @@ export default async function handler(req, res) {
       if (!ok) return res.status(400).json({ ok: false, error: 'Contraseña actual incorrecta' });
       full.passwordHash = await bcrypt.hash(nueva, 10);
       await redis.set(keys.usuario(user.id), full);
+      await logAudit({ actor: user, action: 'auth.password_changed', resource: 'user', resourceId: user.id });
 
       // Invalidar todas las demás sesiones del usuario (la actual sigue siendo válida)
       const cookies = (req.headers.cookie || '').split(';').reduce((a, p) => {

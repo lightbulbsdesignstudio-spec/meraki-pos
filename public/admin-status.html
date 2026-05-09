@@ -48,6 +48,11 @@
       <span id="lastUpdate" style="font-size:12px;color:var(--text-muted)"></span>
     </div>
 
+    <!-- Banner estado degradado (cuando Redis cae) -->
+    <div id="degradedBanner" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:14px;font-weight:500">
+      <strong>⚠ Estado degradado:</strong> Redis no responde. Los conteos de errores y bitácora abajo NO son confiables — pueden mostrar 0 simplemente porque la lectura falló.
+    </div>
+
     <!-- Salud -->
     <div class="status-grid" id="statusGrid">
       <div class="status-card"><div class="status-label">Estado</div><div class="status-value" id="hStatus">—</div></div>
@@ -138,12 +143,17 @@ function pintarSalud(data) {
     ? '<span class="status-pill pill-ok">Operando</span>'
     : '<span class="status-pill pill-fail">Caído</span>';
 
+  // Banner de estado degradado: cuando redis cae, los counts no son confiables.
+  const banner = document.getElementById('degradedBanner');
+  banner.style.display = ok ? 'none' : '';
+
   const lat = data.redis?.latencyMs;
   document.getElementById('hLatency').textContent = lat != null ? `${lat} ms` : '—';
   document.getElementById('hVersion').textContent = data.service.version || 'dev';
   document.getElementById('hRegion').textContent = data.service.region || '—';
-  document.getElementById('hErrors').textContent = data.errors.count;
-  document.getElementById('hAudit').textContent = data.audit.count;
+  // Cuando degraded, ocultar counts engañosos.
+  document.getElementById('hErrors').textContent = ok ? data.errors.count : '?';
+  document.getElementById('hAudit').textContent = ok ? data.audit.count : '?';
 }
 
 function pintarErrores(items) {

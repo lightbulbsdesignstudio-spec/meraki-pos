@@ -935,7 +935,7 @@ async function confirmarCobro() {
             fetch('/api/citas', {
               method: 'PUT', headers: {'Content-Type':'application/json'}, credentials: 'same-origin',
               body: JSON.stringify({ id: citaSeleccionada.id, descuentoLogPendiente: true })
-            }).catch(() => {});
+            }).catch(err => { console.error('Marcar descuentoLogPendiente falló', err); /* el toast principal ya avisa */ });
           }
         } catch (e) {
           toast('Cobro OK pero el descuento NO se registró en auditoría — avisa a Brenda', 'error');
