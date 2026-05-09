@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado del sistema — Meraki Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/assets/styles.css?v=4">
+  <style>
+    .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+    .status-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+    .status-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .status-value{font-size:22px;font-weight:600;font-family:'DM Sans',sans-serif}
+    .status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill-ok{background:#D1FAE5;color:#065F46}
+    .pill-fail{background:#FEE2E2;color:#991B1B}
+    .pill-warn{background:#FEF3C7;color:#92400E}
+    .log-table{width:100%;border-collapse:collapse;font-size:13px}
+    .log-table th{text-align:left;padding:10px 12px;background:var(--surface-light,#F9F7F5);border-bottom:1px solid var(--border);font-weight:600;color:var(--text-muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+    .log-table td{padding:10px 12px;border-bottom:1px solid var(--border-light,#F3EEE9);vertical-align:top}
+    .log-table tr:hover td{background:#FAF8F6}
+    .log-ts{white-space:nowrap;color:var(--text-muted);font-family:'DM Mono','SF Mono',monospace;font-size:11.5px}
+    .log-ctx{font-family:'DM Mono','SF Mono',monospace;font-size:12px;color:#18181A}
+    .log-msg{color:#991B1B;font-size:13px}
+    .log-meta{color:var(--text-light);font-size:11.5px;font-family:'DM Mono',monospace}
+    .empty-state{padding:32px;text-align:center;color:var(--text-muted);font-size:14px}
+    .actions{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+    .tab-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted)}
+    .tab-btn.active{background:#18181A;color:white;border-color:#18181A}
+    details summary{cursor:pointer;font-size:11.5px;color:var(--text-muted);user-select:none}
+    details[open] summary{margin-bottom:6px}
+    pre.detail{background:#FAF8F6;border:1px solid var(--border-light,#F3EEE9);border-radius:6px;padding:8px;font-size:11px;overflow-x:auto;max-width:520px;white-space:pre-wrap;word-break:break-word;color:#3A3935}
+  </style>
+  <script src="/assets/session.js" defer></script>
+</head>
+<body data-page-rol="admin">
+<div class="main" style="margin-left:0">
+  <div class="topbar">
+    <h1>Estado del sistema</h1>
+  </div>
+  <div class="page">
+    <div class="actions">
+      <a href="/index.html" class="tab-btn">← Volver a la agenda</a>
+      <button class="tab-btn active" id="btnRefresh" onclick="cargar()">Actualizar</button>
+      <button class="tab-btn" id="btnSchema" onclick="cargarSchema()" title="Ejecuta auditoría de schema sobre TODAS las citas. Puede tardar.">Auditar schema citas</button>
+      <span id="lastUpdate" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+
+    <!-- Salud -->
+    <div class="status-grid" id="statusGrid">
+      <div class="status-card"><div class="status-label">Estado</div><div class="status-value" id="hStatus">—</div></div>
+      <div class="status-card"><div class="status-label">Latencia Redis</div><div class="status-value" id="hLatency">—</div></div>
+      <div class="status-card"><div class="status-label">Versión</div><div class="status-value" id="hVersion" style="font-size:13px;font-family:'DM Mono',monospace;word-break:break-all">—</div></div>
+      <div class="status-card"><div class="status-label">Región</div><div class="status-value" id="hRegion" style="font-size:16px">—</div></div>
+      <div class="status-card"><div class="status-label">Errores recientes</div><div class="status-value" id="hErrors">—</div></div>
+      <div class="status-card"><div class="status-label">Mutaciones (audit)</div><div class="status-value" id="hAudit">—</div></div>
+    </div>
+
+    <!-- Schema breakdown (opt-in) -->
+    <div class="card" id="cardSchema" style="display:none;margin-bottom:24px;padding:16px 20px">
+      <div style="font-weight:600;margin-bottom:12px">Auditoría schema de citas</div>
+      <div class="status-grid" id="schemaGrid"></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px" id="schemaNota"></div>
+    </div>
+
+    <div class="actions">
+      <button class="tab-btn active" data-tab="errors" onclick="showTab('errors')">Errores recientes</button>
+      <button class="tab-btn" data-tab="audit" onclick="showTab('audit')">Bitácora de cambios</button>
+    </div>
+
+    <!-- Errores -->
+    <div class="card" id="panel-errors">
+      <div class="table-wrap" style="overflow-x:auto">
+        <table class="log-table">
+          <thead><tr><th style="width:160px">Fecha/hora</th><th style="width:140px">Endpoint</th><th>Mensaje</th><th>Detalle</th></tr></thead>
+          <tbody id="tbErrors"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Audit -->
+    <div class="card" id="panel-audit" style="display:none">
+      <div class="table-wrap" style="overflow-x:auto">
+        <table class="log-table">
+          <thead><tr><th style="width:160px">Fecha/hora</th><th style="width:120px">Acción</th><th style="width:140px">Usuario</th><th style="width:140px">Recurso</th><th>Detalle</th></tr></thead>
+          <tbody id="tbAudit"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtTs(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  } catch { return iso; }
+}
+function showTab(name) {
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.getElementById('panel-errors').style.display = name === 'errors' ? '' : 'none';
+  document.getElementById('panel-audit').style.display = name === 'audit' ? '' : 'none';
+}
+
+async function cargar() {
+  document.getElementById('btnRefresh').disabled = true;
+  try {
+    const r = await fetch('/api/admin-status?errors=100&audit=200', { credentials: 'same-origin' });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      alert('Error cargando estado: ' + (err.error || r.status));
+      return;
+    }
+    const { data } = await r.json();
+    pintarSalud(data);
+    pintarErrores(data.errors.items || []);
+    pintarAudit(data.audit.items || []);
+    document.getElementById('lastUpdate').textContent = 'Actualizado ' + fmtTs(new Date().toISOString());
+  } catch (e) {
+    alert('No se pudo cargar el estado: ' + (e.message || e));
+  } finally {
+    document.getElementById('btnRefresh').disabled = false;
+  }
+}
+
+function pintarSalud(data) {
+  const ok = data.service.healthy;
+  const statusEl = document.getElementById('hStatus');
+  statusEl.innerHTML = ok
+    ? '<span class="status-pill pill-ok">Operando</span>'
+    : '<span class="status-pill pill-fail">Caído</span>';
+
+  const lat = data.redis?.latencyMs;
+  document.getElementById('hLatency').textContent = lat != null ? `${lat} ms` : '—';
+  document.getElementById('hVersion').textContent = data.service.version || 'dev';
+  document.getElementById('hRegion').textContent = data.service.region || '—';
+  document.getElementById('hErrors').textContent = data.errors.count;
+  document.getElementById('hAudit').textContent = data.audit.count;
+}
+
+function pintarErrores(items) {
+  const tb = document.getElementById('tbErrors');
+  if (!items.length) {
+    tb.innerHTML = '<tr><td colspan="4" class="empty-state">Sin errores registrados. 🎉</td></tr>';
+    return;
+  }
+  tb.innerHTML = items.map(e => `
+    <tr>
+      <td class="log-ts">${escapeHtml(fmtTs(e.ts))}</td>
+      <td class="log-ctx">${escapeHtml(e.context || '—')}</td>
+      <td class="log-msg">${escapeHtml(e.error?.message || 'sin mensaje')}</td>
+      <td>
+        ${e.error?.stack ? `<details><summary>Stack</summary><pre class="detail">${escapeHtml(e.error.stack)}</pre></details>` : ''}
+        ${e.meta && Object.keys(e.meta).length ? `<details><summary>Meta</summary><pre class="detail">${escapeHtml(JSON.stringify(e.meta, null, 2))}</pre></details>` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function pintarAudit(items) {
+  const tb = document.getElementById('tbAudit');
+  if (!items.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty-state">Sin movimientos registrados.</td></tr>';
+    return;
+  }
+  tb.innerHTML = items.map(a => {
+    const who = a.actor ? `${escapeHtml(a.actor.nombre || a.actor.username)} <span class="log-meta">(${escapeHtml(a.actor.rol)})</span>` : '<span class="log-meta">—</span>';
+    const detalle = [];
+    if (a.before) detalle.push(`<details><summary>Antes</summary><pre class="detail">${escapeHtml(JSON.stringify(a.before, null, 2))}</pre></details>`);
+    if (a.after) detalle.push(`<details><summary>Después</summary><pre class="detail">${escapeHtml(JSON.stringify(a.after, null, 2))}</pre></details>`);
+    if (a.meta && Object.keys(a.meta).length) detalle.push(`<details><summary>Meta</summary><pre class="detail">${escapeHtml(JSON.stringify(a.meta, null, 2))}</pre></details>`);
+    return `
+      <tr>
+        <td class="log-ts">${escapeHtml(fmtTs(a.ts))}</td>
+        <td class="log-ctx">${escapeHtml(a.action || '—')}</td>
+        <td>${who}</td>
+        <td class="log-ctx">${escapeHtml(a.resource || '')}${a.resourceId ? ' <span class="log-meta">' + escapeHtml(a.resourceId) + '</span>' : ''}</td>
+        <td>${detalle.join('') || '<span class="log-meta">—</span>'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function cargarSchema() {
+  const btn = document.getElementById('btnSchema');
+  btn.disabled = true;
+  btn.textContent = 'Auditando…';
+  try {
+    const r = await fetch('/api/admin-status?schema=1&errors=0&audit=0', { credentials: 'same-origin' });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      alert('Error: ' + (err.error || r.status));
+      return;
+    }
+    const { data } = await r.json();
+    const s = data.schema;
+    if (!s) { alert('Sin datos schema'); return; }
+    const card = document.getElementById('cardSchema');
+    card.style.display = '';
+    const grid = document.getElementById('schemaGrid');
+    grid.innerHTML = `
+      <div class="status-card"><div class="status-label">Total</div><div class="status-value">${s.total}</div></div>
+      <div class="status-card"><div class="status-label">Schema nuevo</div><div class="status-value" style="color:#065F46">${s.nuevas}</div></div>
+      <div class="status-card"><div class="status-label">Schema legacy</div><div class="status-value" style="color:${s.legacy > 0 ? '#92400E' : '#065F46'}">${s.legacy}</div></div>
+      <div class="status-card"><div class="status-label">Híbridas</div><div class="status-value">${s.hibridas}</div></div>
+      <div class="status-card"><div class="status-label">Vacías/sin servicio</div><div class="status-value">${s.vacias}</div></div>
+    `;
+    document.getElementById('schemaNota').textContent = s.legacy > 0
+      ? `${s.legacy} citas usan schema legacy (servicioId singular). El helper LibCitas las maneja con backward compat — no requiere migración.`
+      : 'Todas las citas activas usan el schema nuevo o son híbridas. Backward compat OK.';
+  } catch (e) {
+    alert('No se pudo auditar: ' + (e.message || e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Auditar schema citas';
+  }
+}
+
+window.addEventListener('session:ready', cargar);
+</script>
+</body>
+</html>

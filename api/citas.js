@@ -1,6 +1,7 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 async function logEvento(cita, servicios) {
   try {
@@ -86,6 +87,7 @@ export default async function handler(req, res) {
       await redis.set(keys.cita(id), cita);
       await redis.sadd(keys.citas(), id);
       await redis.sadd(keys.citasFecha(cita.fecha), id);
+      await logAudit({ actor: req.user, action: 'cita.create', resource: 'cita', resourceId: id, after: cita });
       return res.json({ ok: true, data: cita });
     }
 
@@ -107,6 +109,7 @@ export default async function handler(req, res) {
 
       const updated = { ...existing, ...patch, id: existing.id, creadoEn: existing.creadoEn };
       await redis.set(keys.cita(body.id), updated);
+      await logAudit({ actor: req.user, action: 'cita.update', resource: 'cita', resourceId: body.id, before: existing, after: updated });
 
       // Cliente devuelve total visitas completadas para loyalty check (visita 10/20/30)
       let totalVisitasCliente = null;
@@ -136,13 +139,14 @@ export default async function handler(req, res) {
         await redis.srem(keys.citasFecha(existing.fecha), body.id);
         await redis.srem(keys.citas(), body.id);
         await redis.del(keys.cita(body.id));
+        await logAudit({ actor: req.user, action: 'cita.delete', resource: 'cita', resourceId: body.id, before: existing });
       }
       return res.json({ ok: true });
     }
 
     res.status(405).json({ ok: false, error: 'Método no permitido' });
   } catch (e) {
-    console.error(e);
+    await logError('api/citas', e, { method: req.method, query: req.query });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

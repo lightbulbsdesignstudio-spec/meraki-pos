@@ -22,6 +22,7 @@
   @media print { .print-header { display: block; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; } }
   </style>
   <script src="/assets/session.js" defer></script>
+  <script src="/assets/lib-citas.js?v=1" defer></script>
 </head>
 <body>
 <nav class="nav">
@@ -165,7 +166,7 @@ async function cargarDescuentos(desde, hasta, periodoLabel) {
     if (resumen) resumen.textContent = `${list.length} descuentos · $${totalDesc.toLocaleString('es-MX')} otorgados · ${periodoLabel || ''}`;
     const viaLabel = v => v === 'whatsapp' ? 'WhatsApp' : v === 'voz' ? 'Voz' : v === 'presencial' ? 'Presencial' : 'Pendiente';
     const labelServiciosDescuento = d => {
-      const arr = (d.servicios && d.servicios.length) ? d.servicios : (d.servicioId ? [{id: d.servicioId}] : []);
+      const arr = LibCitas.citaServiciosArray(d);
       const nombres = arr.map(s => _serviciosCache?.[s.id]?.nombre).filter(Boolean);
       if (!nombres.length) return '—';
       return nombres.length === 1 ? nombres[0] : `${nombres[0]} +${nombres.length - 1}`;

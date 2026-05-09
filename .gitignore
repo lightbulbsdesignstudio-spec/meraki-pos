@@ -6,3 +6,4 @@ node_modules/
 .DS_Store
 preview.html
 preview-wa.html
+.env*.local

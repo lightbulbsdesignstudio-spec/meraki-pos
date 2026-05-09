@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/assets/styles.css?v=4">
   <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}</style>
   <script src="/assets/session.js" defer></script>
+  <script src="/assets/lib-citas.js?v=1" defer></script>
 </head>
 <body>
 
@@ -386,7 +387,7 @@ async function cargarNegocioCfg() {
     const r = await fetch('/api/config-negocio', { credentials:'same-origin' });
     const d = await r.json();
     if (d.ok) negocioCfg = d.data;
-  } catch(e) {}
+  } catch(e) { console.error('cargarNegocioCfg', e); toast('No se pudo cargar la configuración del negocio.', 'error'); }
 }
 function formatCLABE(c) {
   if (!c) return '';
@@ -405,17 +406,21 @@ function toast(msg, type='') {
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 async function cargarTecnicas() {
-  try { const r = await fetch('/api/config?tipo=tecnicas', { credentials:'same-origin' }); const d = await r.json(); tecnicos = d.data || []; poblarSelectTecnicas(); } catch(e) {}
+  try { const r = await fetch('/api/config?tipo=tecnicas', { credentials:'same-origin' }); const d = await r.json(); tecnicos = d.data || []; poblarSelectTecnicas(); }
+  catch(e) { console.error('cargarTecnicas', e); toast('No se pudieron cargar las nail techs. Revisa tu conexión.', 'error'); }
 }
 async function cargarServicios() {
-  try { const r = await fetch('/api/config?tipo=servicios', { credentials:'same-origin' }); const d = await r.json(); servicios = d.data || []; } catch(e) {}
+  try { const r = await fetch('/api/config?tipo=servicios', { credentials:'same-origin' }); const d = await r.json(); servicios = d.data || []; }
+  catch(e) { console.error('cargarServicios', e); toast('No se pudieron cargar los servicios. Revisa tu conexión.', 'error'); }
 }
 async function cargarClientes() {
-  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; poblarSelectClientes(); } catch(e) {}
+  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; poblarSelectClientes(); }
+  catch(e) { console.error('cargarClientes', e); toast('No se pudieron cargar las clientas. Revisa tu conexión.', 'error'); }
 }
 async function cargarCitas() {
   const fecha = formatDate(fechaActual);
-  try { const r = await fetch(`/api/citas?fecha=${fecha}`, { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; } catch(e) {}
+  try { const r = await fetch(`/api/citas?fecha=${fecha}`, { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; }
+  catch(e) { console.error('cargarCitas', e); toast('No se pudieron cargar las citas. Revisa tu conexión.', 'error'); }
 }
 
 // ─── Selects ─────────────────────────────────────────────────────────────────
@@ -486,7 +491,7 @@ function renderCalendario() {
 
       const chips = citasHora.map(c => {
         const cli = clientes.find(cl => cl.id === c.clienteId);
-        const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+        const citaServicios = LibCitas.citaServiciosArray(c);
         const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
         const svcLabel = svcObjs.length === 0 ? ''
           : svcObjs.length === 1 ? svcObjs[0].nombre
@@ -525,7 +530,7 @@ function renderCalendario() {
 // ─── CRUD Citas ──────────────────────────────────────────────────────────────
 function abrirModalCita(data = {}) {
   citaEditando = data.id || null;
-  citaServiciosAgregados = data.servicios || (data.servicioId ? [{id: data.servicioId}] : []);
+  citaServiciosAgregados = LibCitas.citaServiciosArray(data);
   document.getElementById('modalCitaTitulo').textContent = citaEditando ? 'Editar cita' : 'Nueva cita';
   document.getElementById('citaFecha').value = data.fecha || formatDate(fechaActual);
   document.getElementById('citaHora').value = data.hora || '10:00';
@@ -596,7 +601,7 @@ function verCita(id) {
   if (!citaSeleccionada) return;
   const c = citaSeleccionada;
   const cli = clientes.find(cl => cl.id === c.clienteId);
-  const citaServicios = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
+  const citaServicios = LibCitas.citaServiciosArray(c);
   const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
   const precioTotal = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   const tec = tecnicos.find(t => t.id === c.tecnicaId);
@@ -661,7 +666,7 @@ async function cambiarEstadoCita(nuevoEstado) {
 function enviarRecordatorio() {
   if (!citaSeleccionada) return;
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
-  const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+  const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
   const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
   const servicioNombres = svcObjs.map(s => s.nombre).join(', ');
   const tec = tecnicos.find(t => t.id === citaSeleccionada.tecnicaId);
@@ -673,7 +678,7 @@ function enviarRecordatorio() {
 // ─── COBRO SPEI-FIRST ─────────────────────────────────────────────────────────
 function abrirCobro() {
   if (!citaSeleccionada) return;
-  const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+  const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
   const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
   const precioTotal = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   const cli = clientes.find(c => c.id === citaSeleccionada.clienteId);
@@ -752,7 +757,7 @@ function renderExtras() {
 function recalcularTotal() {
   let base = 0;
   if (citaSeleccionada) {
-    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
     const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
     base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   }
@@ -778,7 +783,7 @@ function recalcularTotal() {
 function abrirModalDescuento() {
   let base = 0;
   if (citaSeleccionada) {
-    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
     const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
     base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   }
@@ -797,7 +802,7 @@ function abrirModalDescuento() {
 function recalcularDescuento() {
   let base = 0;
   if (citaSeleccionada) {
-    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
     const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
     base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   }
@@ -824,7 +829,7 @@ function pedirAutorizacionWA() {
   let base = 0;
   let servicioNombres = '';
   if (citaSeleccionada) {
-    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
     const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
     base = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
     servicioNombres = svcObjs.map(s => s.nombre).join(', ');
@@ -884,7 +889,7 @@ async function confirmarCobro() {
 
   let montoBase = 0;
   if (citaSeleccionada) {
-    const citaServicios = citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []);
+    const citaServicios = LibCitas.citaServiciosArray(citaSeleccionada);
     const svcObjs = citaServicios.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
     montoBase = svcObjs.reduce((sum, s) => sum + Number(s.precio || 0), 0);
   }
@@ -911,7 +916,7 @@ async function confirmarCobro() {
               citaId: citaSeleccionada.id,
               clienteId: citaSeleccionada.clienteId,
               servicioId: citaSeleccionada.servicioId,
-              servicios: citaSeleccionada.servicios || (citaSeleccionada.servicioId ? [{id: citaSeleccionada.servicioId}] : []),
+              servicios: LibCitas.citaServiciosArray(citaSeleccionada),
               tecnicaId: citaSeleccionada.tecnicaId,
               montoOriginal: montoBase + totalExtras,
               monto: cobroDescuento.monto,

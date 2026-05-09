@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import redis, { keys } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { newToken, setSessionCookie, clearSessionCookie, getSessionUser } from '../lib/auth.js';
+import { logError } from '../lib/observability.js';
 
 const SESSION_TTL = 60 * 60 * 12;
 
@@ -120,7 +121,7 @@ export default async function handler(req, res) {
 
     return res.status(400).json({ ok: false, error: 'Acción no especificada (?action=login|logout|me|change-password)' });
   } catch (e) {
-    console.error(e);
+    await logError('api/auth', e, { method: req.method, url: req.url });
     return res.status(500).json({ ok: false, error: e.message });
   }
 }

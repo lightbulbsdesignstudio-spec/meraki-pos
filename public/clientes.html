@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/assets/styles.css?v=4">
   <style>@media(max-width:768px){.nav{display:none!important}.main{margin-left:0!important;padding-bottom:72px}.topbar{padding:12px 16px}.page{padding:16px}.cal-filter{display:none}.nav-bottom{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:#18181A;z-index:300;border-top:1px solid rgba(255,255,255,.1)}.nav-bottom-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;color:rgba(255,255,255,.45);text-decoration:none;font-size:10px;font-weight:500}.nav-bottom-item.active{color:#fff}.nav-bottom-item svg{width:22px;height:22px;stroke-width:1.8}}</style>
   <script src="/assets/session.js" defer></script>
+  <script src="/assets/lib-citas.js?v=1" defer></script>
 </head>
 <body>
 <nav class="nav">
@@ -152,17 +153,19 @@ async function init() {
 }
 
 async function cargarClientes() {
-  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; } catch {}
+  try { const r = await fetch('/api/clientes', { credentials:'same-origin' }); const d = await r.json(); clientes = d.data || []; }
+  catch (e) { console.error('cargarClientes', e); toast('No se pudieron cargar las clientas. Revisa tu conexión.', 'error'); }
 }
 async function cargarCitas() {
-  try { const r = await fetch('/api/citas?all=1', { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; } catch {}
+  try { const r = await fetch('/api/citas?all=1', { credentials:'same-origin' }); const d = await r.json(); citas = d.data || []; }
+  catch (e) { console.error('cargarCitas', e); toast('No se pudieron cargar las citas. Revisa tu conexión.', 'error'); }
 }
 async function cargarConfig() {
   try {
     const [rt, rs] = await Promise.all([fetch('/api/config?tipo=tecnicas', { credentials:'same-origin' }), fetch('/api/config?tipo=servicios', { credentials:'same-origin' })]);
     tecnicos = (await rt.json()).data || [];
     servicios = (await rs.json()).data || [];
-  } catch {}
+  } catch (e) { console.error('cargarConfig', e); toast('No se pudo cargar la configuración (técnicas/servicios).', 'error'); }
 }
 
 function citasDe(clienteId) {
@@ -170,15 +173,8 @@ function citasDe(clienteId) {
               .sort((a, b) => b.fecha.localeCompare(a.fecha));
 }
 
-function getServiciosDeCita(c) {
-  const arr = c.servicios || (c.servicioId ? [{id: c.servicioId}] : []);
-  return arr.map(s => servicios.find(svc => svc.id === s.id)).filter(Boolean);
-}
-
-function montoCita(c) {
-  if (c.totalCobrado != null) return Number(c.totalCobrado);
-  return getServiciosDeCita(c).reduce((sum, s) => sum + Number(s.precio || 0), 0);
-}
+function getServiciosDeCita(c) { return LibCitas.getServiciosDeCita(c, servicios); }
+function montoCita(c) { return LibCitas.montoCita(c, servicios); }
 
 function totalGastado(citasCli) {
   return citasCli.reduce((sum, c) => sum + montoCita(c), 0);

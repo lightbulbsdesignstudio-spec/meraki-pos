@@ -1,6 +1,7 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -33,12 +34,14 @@ export default async function handler(req, res) {
         const obj = { id, nombre: body.nombre, tel: body.tel || '', color: body.color || '#B5705F', activa: body.activa !== false, comision: Number(body.comision) || 0 };
         await redis.set(keys.tecnica(id), obj);
         await redis.sadd(keys.tecnicas(), id);
+        await logAudit({ actor: req.user, action: 'tecnica.create', resource: 'tecnica', resourceId: id, after: obj });
         return res.json({ ok: true, data: obj });
       }
       if (body.tipo === 'servicio') {
         const obj = { id, nombre: body.nombre, precio: body.precio, duracion: body.duracion, categoria: body.categoria, desc: body.desc || '' };
         await redis.set(keys.servicio(id), obj);
         await redis.sadd(keys.servicios(), id);
+        await logAudit({ actor: req.user, action: 'servicio.create', resource: 'servicio', resourceId: id, after: obj });
         return res.json({ ok: true, data: obj });
       }
     }
@@ -49,6 +52,7 @@ export default async function handler(req, res) {
         if (!existing) return res.status(404).json({ ok: false, error: 'No encontrado' });
         const obj = { ...existing, nombre: body.nombre, tel: body.tel || '', color: body.color || existing.color || '#B5705F', activa: body.activa !== false, comision: Number(body.comision) || 0 };
         await redis.set(keys.tecnica(body.id), obj);
+        await logAudit({ actor: req.user, action: 'tecnica.update', resource: 'tecnica', resourceId: body.id, before: existing, after: obj });
         return res.json({ ok: true, data: obj });
       }
       if (body.tipo === 'servicio') {
@@ -56,26 +60,31 @@ export default async function handler(req, res) {
         if (!existing) return res.status(404).json({ ok: false, error: 'No encontrado' });
         const obj = { ...existing, nombre: body.nombre, precio: body.precio, duracion: body.duracion, categoria: body.categoria, desc: body.desc || '' };
         await redis.set(keys.servicio(body.id), obj);
+        await logAudit({ actor: req.user, action: 'servicio.update', resource: 'servicio', resourceId: body.id, before: existing, after: obj });
         return res.json({ ok: true, data: obj });
       }
     }
 
     if (req.method === 'DELETE') {
       if (body.tipo === 'servicio') {
+        const existing = await redis.get(keys.servicio(body.id));
         await redis.del(keys.servicio(body.id));
         await redis.srem(keys.servicios(), body.id);
+        await logAudit({ actor: req.user, action: 'servicio.delete', resource: 'servicio', resourceId: body.id, before: existing });
         return res.json({ ok: true });
       }
       if (body.tipo === 'tecnica') {
+        const existing = await redis.get(keys.tecnica(body.id));
         await redis.del(keys.tecnica(body.id));
         await redis.srem(keys.tecnicas(), body.id);
+        await logAudit({ actor: req.user, action: 'tecnica.delete', resource: 'tecnica', resourceId: body.id, before: existing });
         return res.json({ ok: true });
       }
     }
 
     res.status(405).json({ ok: false, error: 'Método no permitido' });
   } catch (e) {
-    console.error(e);
+    await logError('api/config', e, { method: req.method });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { requireAuth, ROLES } from '../lib/auth.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 function sanitize(u) {
   if (!u) return null;
@@ -57,6 +58,7 @@ export default async function handler(req, res) {
       await redis.set(keys.usuario(id), user);
       await redis.set(keys.usuarioByUsername(username), id);
       await redis.sadd(keys.usuarios(), id);
+      await logAudit({ actor: req.user, action: 'user.create', resource: 'user', resourceId: id, after: sanitize(user) });
       return res.json({ ok: true, data: sanitize(user) });
     }
 
@@ -81,6 +83,7 @@ export default async function handler(req, res) {
       }
 
       await redis.set(keys.usuario(body.id), updated);
+      await logAudit({ actor: req.user, action: 'user.update', resource: 'user', resourceId: body.id, before: sanitize(existing), after: sanitize(updated), meta: { passwordChanged: !!(body.password && String(body.password).length >= 6) } });
       return res.json({ ok: true, data: sanitize(updated) });
     }
 
@@ -96,13 +99,14 @@ export default async function handler(req, res) {
         await redis.del(keys.usuario(body.id));
         await redis.del(keys.usuarioByUsername(existing.username));
         await redis.srem(keys.usuarios(), body.id);
+        await logAudit({ actor: req.user, action: 'user.delete', resource: 'user', resourceId: body.id, before: sanitize(existing) });
       }
       return res.json({ ok: true });
     }
 
     res.status(405).json({ ok: false, error: 'Método no permitido' });
   } catch (e) {
-    console.error(e);
+    await logError('api/users', e, { method: req.method });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

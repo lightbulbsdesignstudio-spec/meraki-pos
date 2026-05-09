@@ -1,5 +1,6 @@
 import redis, { keys } from '../lib/redis.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError } from '../lib/observability.js';
 
 // Endpoint para el ecosistema Claude de Meraki
 // Devuelve datos ricos para análisis de marketing, geoespacial y social ROI
@@ -126,7 +127,7 @@ export default async function handler(req, res) {
       }
     });
   } catch (e) {
-    console.error(e);
+    await logError('api/analytics', e, { method: req.method, query: req.query });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

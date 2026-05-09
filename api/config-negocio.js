@@ -1,6 +1,7 @@
 import redis, { keys } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 const DEFAULT_CONFIG = {
   clabe: '',
@@ -57,12 +58,13 @@ export default async function handler(req, res) {
 
       const updated = { ...existing, ...patch, actualizadoEn: new Date().toISOString() };
       await redis.set(keys.configNegocio(), updated);
+      await logAudit({ actor: req.user, action: 'config-negocio.update', resource: 'config-negocio', before: existing, after: updated });
       return res.json({ ok: true, data: updated });
     }
 
     res.status(405).json({ ok: false, error: 'Método no permitido' });
   } catch (e) {
-    console.error(e);
+    await logError('api/config-negocio', e, { method: req.method });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

@@ -1,5 +1,6 @@
 import redis, { keys } from '../lib/redis.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError } from '../lib/observability.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -107,7 +108,7 @@ export default async function handler(req, res) {
       }
     });
   } catch (e) {
-    console.error(e);
+    await logError('api/reportes', e, { method: req.method, query: req.query });
     res.status(500).json({ ok: false, error: e.message });
   }
 }

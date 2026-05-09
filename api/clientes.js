@@ -1,6 +1,7 @@
 import redis, { keys, newId } from '../lib/redis.js';
 import parseBody from '../lib/parseBody.js';
 import { requireAuth } from '../lib/auth.js';
+import { logError, logAudit } from '../lib/observability.js';
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
       };
       await redis.set(keys.cliente(id), cliente);
       await redis.sadd(keys.clientes(), id);
+      await logAudit({ actor: req.user, action: 'cliente.create', resource: 'cliente', resourceId: id, after: cliente });
       return res.json({ ok: true, data: cliente });
     }
 
@@ -53,18 +55,21 @@ export default async function handler(req, res) {
         notas: body.notas || '',
       };
       await redis.set(keys.cliente(body.id), updated);
+      await logAudit({ actor: req.user, action: 'cliente.update', resource: 'cliente', resourceId: body.id, before: existing, after: updated });
       return res.json({ ok: true, data: updated });
     }
 
     if (req.method === 'DELETE') {
+      const existing = await redis.get(keys.cliente(body.id));
       await redis.del(keys.cliente(body.id));
       await redis.srem(keys.clientes(), body.id);
+      await logAudit({ actor: req.user, action: 'cliente.delete', resource: 'cliente', resourceId: body.id, before: existing });
       return res.json({ ok: true });
     }
 
     res.status(405).json({ ok: false, error: 'Método no permitido' });
   } catch (e) {
-    console.error(e);
+    await logError('api/clientes', e, { method: req.method });
     res.status(500).json({ ok: false, error: e.message });
   }
 }
